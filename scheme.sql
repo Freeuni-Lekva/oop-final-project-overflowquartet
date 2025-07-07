@@ -11,7 +11,8 @@ DROP TABLE IF EXISTS messages;
 DROP TABLE IF EXISTS friends;
 DROP TABLE IF EXISTS quizzes;
 DROP TABLE IF EXISTS users;
-
+DROP TABLE IF EXISTS announcements;
+DROP TABLE IF EXISTS achievements;
 -- USERS
 CREATE TABLE users (
                        user_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -108,4 +109,22 @@ CREATE TABLE messages (
                           sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                           FOREIGN KEY (sender_id) REFERENCES users(user_id),
                           FOREIGN KEY (receiver_id) REFERENCES users(user_id)
+);
+
+-- ANNOUNCEMENTS
+CREATE TABLE announcements (
+                               announcement_id INT AUTO_INCREMENT PRIMARY KEY,
+                               admin_id INT NOT NULL,
+                               content TEXT NOT NULL,
+                               created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                               FOREIGN KEY (admin_id) REFERENCES users(user_id)
+);
+
+-- ACHIEVEMENTS
+CREATE TABLE achievements (
+                              achievement_id INT AUTO_INCREMENT PRIMARY KEY,
+                              user_id INT NOT NULL,
+                              achievement_type ENUM('amateur_author', 'prolific_author', 'prodigious_author', 'quiz_machine', 'i_am_the_greatest', 'practice_makes_perfect') NOT NULL,
+                              awarded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                              FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
