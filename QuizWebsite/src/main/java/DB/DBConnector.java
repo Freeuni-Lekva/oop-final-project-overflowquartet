@@ -18,7 +18,7 @@ public class DBConnector {
     // Update these for your own setup
     private static final String DATABASE_NAME = "quiz_db";
     private static final String USER = "root";
-    private static final String PASS = "admin123";
+    private static final String PASS = "Apple123!";
 
     private static final String URL =
             "jdbc:mysql://localhost:3306/" + DATABASE_NAME;
