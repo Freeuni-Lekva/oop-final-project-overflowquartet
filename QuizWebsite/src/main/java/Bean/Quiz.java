@@ -11,6 +11,7 @@ public class Quiz {
     private boolean multiplePages;
     private boolean immediateCorrection;
     private Timestamp creationDate;
+    private int questionCount;
 
     public int getQuizId() {
         return quizId;
@@ -59,5 +60,11 @@ public class Quiz {
     }
     public void setCreationDate(Timestamp creationDate) {
         this.creationDate = creationDate;
+    }
+    public int getQuestionCount() {
+        return questionCount;
+    }
+    public void setQuestionCount(int questionCount) {
+        this.questionCount = questionCount;
     }
 } 

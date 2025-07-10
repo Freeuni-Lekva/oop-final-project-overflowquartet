@@ -51,7 +51,7 @@
 
 <!-- ─── TOP NAV ─────────────────────────────────────────────────────── -->
 <nav class="navbar navbar-expand-lg navbar-dark glass-card mx-3 mt-3 px-3">
-    <a class="navbar-brand fw-semibold" href="${pageContext.request.contextPath}/">QuizSite</a>
+    <a class="navbar-brand fw-semibold" href="<%= request.getContextPath() %>/">QuizSite</a>
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
         <span class="navbar-toggler-icon"></span>
@@ -60,15 +60,15 @@
     <div class="collapse navbar-collapse" id="navMain">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
-            <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/quizzes">Quizzes</a></li>
-            <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/create">Create Quiz</a></li>
+            <li class="nav-item"><a class="nav-link" href="<%= request.getContextPath() %>/quizzes">Quizzes</a></li>
+            <li class="nav-item"><a class="nav-link" href="<%= request.getContextPath() %>/create">Create Quiz</a></li>
         </ul>
 
         <!-- show username if logged in -->
         <span class="navbar-text me-3">
         <!-- ${sessionScope.user.displayName} -->
       </span>
-        <a href="${pageContext.request.contextPath}/logout" class="btn btn-outline-light btn-sm">
+        <a href="<%= request.getContextPath() %>/LogoutServlet" class="btn btn-outline-light btn-sm">
             Log out
         </a>
     </div>
@@ -79,7 +79,7 @@
     <div class="container">
         <h1 class="display-5 fw-bold">Test Your Knowledge, Challenge Friends!</h1>
         <p class="lead mb-4">Browse thousands of community-made quizzes or craft your own in minutes.</p>
-        <a href="${pageContext.request.contextPath}/quizzes" class="btn btn-light btn-lg text-primary fw-semibold">
+        <a href="<%= request.getContextPath() %>/quizzes" class="btn btn-light btn-lg text-primary fw-semibold">
             Browse Quizzes
         </a>
     </div>
@@ -100,7 +100,7 @@
                     <p class="small flex-grow-1">${quiz.description}</p>
                     <div class="d-flex justify-content-between align-items-center mt-2">
                         <span class="small"><i class="bi bi-question-circle"></i> ${quiz.questionCount} Qs</span>
-                        <a href="${pageContext.request.contextPath}/quiz?id=${quiz.id}"
+                        <a href="<%= request.getContextPath() %>/quiz?id=${quiz.quizId}"
                            class="btn btn-sm btn-light text-primary fw-semibold">
                             Play
                         </a>
