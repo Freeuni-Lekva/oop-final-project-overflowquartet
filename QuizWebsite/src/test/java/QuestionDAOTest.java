@@ -1,150 +1,221 @@
-//
-//
-//import Bean.Question;
-//import Bean.Choice;
-//import DB.DBConnector;
-//import DB.QuestionDAO;
-//import org.junit.jupiter.api.*;
-//
-//import java.sql.Connection;
-//import java.sql.Statement;
-//import java.util.Arrays;
-//import java.util.List;
-//
-//import static org.junit.jupiter.api.Assertions.*;
-//
-//class QuestionDAOTest {
-//
-//    private QuestionDAO dao;
-//
-//    @BeforeEach
-//    void setUp() throws Exception {
-//        dao = new QuestionDAO();
-//        // clean out all tables before each test
-//        try (Connection conn = DBConnector.getConnection();
-//             Statement st = conn.createStatement()) {
-//            st.executeUpdate("DELETE FROM question_choices");
-//            st.executeUpdate("DELETE FROM questions");
-//        }
-//    }
-//
-//    @Test
-//    void testAddAndGetMultipleChoiceQuestion() throws Exception {
-//        // prepare a multiple-choice question
-//        Question q = new Question();
-//        q.setQuizId(100);
-//        q.setQuestionType("multiple_choice");
-//        q.setQuestionText("What is 2+2?");
-//        q.setImageUrl(null);
-//        q.setQuestionOrder(1);
-//        Choice c1 = new Choice(); c1.setChoiceText("3"); c1.setCorrect(false);
-//        Choice c2 = new Choice(); c2.setChoiceText("4"); c2.setCorrect(true);
-//        q.setChoices(Arrays.asList(c1, c2));
-//
-//        int id = dao.addQuestion(q);
-//        assertTrue(id > 0, "addQuestion should return generated key > 0");
-//
-//        Question fetched = dao.getQuestion(id);
-//        assertNotNull(fetched, "getQuestion should return a Question object");
-//        assertEquals("What is 2+2?", fetched.getQuestionText());
-//        List<Choice> choices = fetched.getChoices();
-//        assertEquals(2, choices.size(), "There should be exactly 2 choices");
-//        assertTrue(choices.stream().anyMatch(ch -> ch.isCorrect() && "4".equals(ch.getChoiceText())));
-//    }
-//
-//    @Test
-//    void testAddAndGetQuestionResponse() throws Exception {
-//        // prepare a free-response question
-//        Question q = new Question();
-//        q.setQuizId(200);
-//        q.setQuestionType("question_response");
-//        q.setQuestionText("Name a primary color.");
-//        q.setImageUrl(null);
-//        q.setQuestionOrder(2);
-//        q.setAnswers(Arrays.asList("red", "blue", "yellow"));
-//
-//        int id = dao.addQuestion(q);
-//        assertTrue(id > 0);
-//
-//        Question fetched = dao.getQuestion(id);
-//        assertNotNull(fetched);
-//        assertEquals("Name a primary color.", fetched.getQuestionText());
-//        List<String> answers = fetched.getAnswers();
-//        assertEquals(3, answers.size());
-//        assertTrue(answers.contains("red"));
-//    }
-//
-//    @Test
-//    void testGetQuestionsForQuiz() throws Exception {
-//        // Add two questions under the same quiz
-//        Question q1 = new Question();
-//        q1.setQuizId(300);
-//        q1.setQuestionType("question_response");
-//        q1.setQuestionText("First question?");
-//        q1.setImageUrl(null);
-//        q1.setQuestionOrder(1);
-//        q1.setAnswers(Arrays.asList("a1"));
-//        int id1 = dao.addQuestion(q1);
-//
-//        Question q2 = new Question();
-//        q2.setQuizId(300);
-//        q2.setQuestionType("question_response");
-//        q2.setQuestionText("Second question?");
-//        q2.setImageUrl(null);
-//        q2.setQuestionOrder(2);
-//        q2.setAnswers(Arrays.asList("a2"));
-//        int id2 = dao.addQuestion(q2);
-//
-//        List<Question> list = dao.getQuestionsForQuiz(300);
-//        assertEquals(2, list.size(), "Should retrieve exactly two questions");
-//        assertEquals(id1, list.get(0).getQuestionId(), "Questions should be ordered by question_order");
-//        assertEquals(id2, list.get(1).getQuestionId());
-//    }
-//
-//    @Test
-//    void testUpdateQuestion() throws Exception {
-//        // start by adding a multiple-choice question
-//        Question q = new Question();
-//        q.setQuizId(400);
-//        q.setQuestionType("multiple_choice");
-//        q.setQuestionText("Old text?");
-//        q.setImageUrl(null);
-//        q.setQuestionOrder(1);
-//        Choice oldC = new Choice(); oldC.setChoiceText("old"); oldC.setCorrect(true);
-//        q.setChoices(Arrays.asList(oldC));
-//        int id = dao.addQuestion(q);
-//
-//        // modify it: change text, replace choices
-//        q.setQuestionId(id);
-//        q.setQuestionText("New text?");
-//        Choice newC1 = new Choice(); newC1.setChoiceText("n1"); newC1.setCorrect(false);
-//        Choice newC2 = new Choice(); newC2.setChoiceText("n2"); newC2.setCorrect(true);
-//        q.setChoices(Arrays.asList(newC1, newC2));
-//        dao.updateQuestion(q);
-//
-//        Question updated = dao.getQuestion(id);
-//        assertEquals("New text?", updated.getQuestionText());
-//        List<Choice> choices = updated.getChoices();
-//        assertEquals(2, choices.size(), "Old choices should be deleted and new ones inserted");
-//        assertTrue(choices.stream().anyMatch(ch -> "n2".equals(ch.getChoiceText()) && ch.isCorrect()));
-//    }
-//
-//    @Test
-//    void testDeleteQuestion() throws Exception {
-//        // add a fill-in-the-blank question
-//        Question q = new Question();
-//        q.setQuizId(500);
-//        q.setQuestionType("fill_blank");
-//        q.setQuestionText("Blank?");
-//        q.setImageUrl(null);
-//        q.setQuestionOrder(1);
-//        q.setAnswers(Arrays.asList("ans"));
-//        int id = dao.addQuestion(q);
-//
-//        // now delete it
-//        dao.deleteQuestion(id);
-//
-//        Question deleted = dao.getQuestion(id);
-//        assertNull(deleted, "After deletion, getQuestion should return null");
-//    }
-//}
+import Bean.Choice;
+import Bean.Question;
+import DB.DBConnector;
+import DB.QuestionDAO;
+import org.junit.jupiter.api.*;
+
+import java.sql.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+@TestInstance(TestInstance.Lifecycle.PER_METHOD)
+public class QuestionDAOTest {
+
+    private int userId;
+    private int quizId;
+
+    @BeforeEach
+    public void setup() throws SQLException {
+        try (Connection conn = DBConnector.getConnection()) {
+            // Insert user
+            PreparedStatement userStmt = conn.prepareStatement(
+                    "INSERT INTO users (username, password_hash, display_name) VALUES (?, ?, ?)",
+                    Statement.RETURN_GENERATED_KEYS);
+            userStmt.setString(1, "testuser_" + System.nanoTime());
+            userStmt.setString(2, "hash");
+            userStmt.setString(3, "Test User");
+            userStmt.executeUpdate();
+            try (ResultSet rs = userStmt.getGeneratedKeys()) {
+                assertTrue(rs.next());
+                userId = rs.getInt(1);
+            }
+            // Insert quiz (owner is this user)
+            PreparedStatement quizStmt = conn.prepareStatement(
+                    "INSERT INTO quizzes (owner_id, title, description) VALUES (?, ?, ?)",
+                    Statement.RETURN_GENERATED_KEYS);
+            quizStmt.setInt(1, userId);
+            quizStmt.setString(2, "JUnit Test Quiz " + System.nanoTime());
+            quizStmt.setString(3, "For QuestionDAO testing");
+            quizStmt.executeUpdate();
+            try (ResultSet rs = quizStmt.getGeneratedKeys()) {
+                assertTrue(rs.next());
+                quizId = rs.getInt(1);
+            }
+        }
+    }
+
+    @AfterEach
+    public void cleanup() throws SQLException {
+        try (Connection conn = DBConnector.getConnection()) {
+            // Remove questions and children
+            PreparedStatement delAnswers = conn.prepareStatement(
+                    "DELETE FROM question_answers WHERE question_id IN (SELECT question_id FROM questions WHERE quiz_id = ?)");
+            delAnswers.setInt(1, quizId);
+            delAnswers.executeUpdate();
+
+            PreparedStatement delChoices = conn.prepareStatement(
+                    "DELETE FROM question_choices WHERE question_id IN (SELECT question_id FROM questions WHERE quiz_id = ?)");
+            delChoices.setInt(1, quizId);
+            delChoices.executeUpdate();
+
+            PreparedStatement delQuestions = conn.prepareStatement(
+                    "DELETE FROM questions WHERE quiz_id = ?");
+            delQuestions.setInt(1, quizId);
+            delQuestions.executeUpdate();
+
+            PreparedStatement delQuiz = conn.prepareStatement(
+                    "DELETE FROM quizzes WHERE quiz_id = ?");
+            delQuiz.setInt(1, quizId);
+            delQuiz.executeUpdate();
+
+            PreparedStatement delUser = conn.prepareStatement(
+                    "DELETE FROM users WHERE user_id = ?");
+            delUser.setInt(1, userId);
+            delUser.executeUpdate();
+        }
+    }
+
+    @Test
+    public void testAddAndGetQuestionResponse() throws Exception {
+        QuestionDAO dao = new QuestionDAO();
+
+        Question question = new Question();
+        question.setQuizId(quizId);
+        question.setQuestionType("question_response");
+        question.setQuestionText("Who was the first US president?");
+        question.setImageUrl(null);
+        question.setQuestionOrder(1);
+        question.setAnswers(Arrays.asList("George Washington", "Washington"));
+
+        int id = dao.addQuestion(question);
+        assertTrue(id > 0);
+        Question fromDb = dao.getQuestion(id);
+
+        assertNotNull(fromDb);
+        assertEquals("question_response", fromDb.getQuestionType());
+        assertEquals("Who was the first US president?", fromDb.getQuestionText());
+        assertNotNull(fromDb.getAnswers());
+        assertTrue(fromDb.getAnswers().contains("George Washington"));
+        assertTrue(fromDb.getAnswers().contains("Washington"));
+        assertNull(fromDb.getChoices());
+    }
+
+    @Test
+    public void testAddAndGetMultipleChoiceQuestion() throws Exception {
+        QuestionDAO dao = new QuestionDAO();
+
+        Question question = new Question();
+        question.setQuizId(quizId);
+        question.setQuestionType("multiple_choice");
+        question.setQuestionText("Which planet is known as the Red Planet?");
+        question.setImageUrl(null);
+        question.setQuestionOrder(2);
+        question.setChoices(Arrays.asList(
+                new Choice("Mars", true),
+                new Choice("Venus", false),
+                new Choice("Earth", false)
+        ));
+
+        int id = dao.addQuestion(question);
+        assertTrue(id > 0);
+
+        Question fromDb = dao.getQuestion(id);
+
+        assertNotNull(fromDb);
+        assertEquals("multiple_choice", fromDb.getQuestionType());
+        assertEquals("Which planet is known as the Red Planet?", fromDb.getQuestionText());
+        assertNotNull(fromDb.getChoices());
+        assertEquals(3, fromDb.getChoices().size());
+        assertTrue(fromDb.getChoices().stream().anyMatch(c -> c.getChoiceText().equals("Mars") && c.isCorrect()));
+    }
+
+    @Test
+    public void testUpdateQuestion() throws Exception {
+        QuestionDAO dao = new QuestionDAO();
+
+        Question question = new Question();
+        question.setQuizId(quizId);
+        question.setQuestionType("question_response");
+        question.setQuestionText("Who is CEO of Tesla?");
+        question.setImageUrl(null);
+        question.setQuestionOrder(3);
+        question.setAnswers(Collections.singletonList("Elon Musk"));
+        int id = dao.addQuestion(question);
+
+        // Change to multiple_choice and update fields
+        question.setQuestionType("multiple_choice");
+        question.setQuestionText("Who is CEO of SpaceX?");
+        question.setChoices(Arrays.asList(
+                new Choice("Jeff Bezos", false),
+                new Choice("Elon Musk", true),
+                new Choice("Tim Cook", false)
+        ));
+        question.setAnswers(null); // Should be ignored
+
+        dao.updateQuestion(question);
+
+        Question updated = dao.getQuestion(id);
+        assertNotNull(updated);
+        assertEquals("multiple_choice", updated.getQuestionType());
+        assertEquals("Who is CEO of SpaceX?", updated.getQuestionText());
+        assertNotNull(updated.getChoices());
+        assertEquals(3, updated.getChoices().size());
+        assertTrue(updated.getChoices().stream().anyMatch(c -> c.getChoiceText().equals("Elon Musk") && c.isCorrect()));
+    }
+
+    @Test
+    public void testDeleteQuestion() throws Exception {
+        QuestionDAO dao = new QuestionDAO();
+
+        Question question = new Question();
+        question.setQuizId(quizId);
+        question.setQuestionType("fill_blank");
+        question.setQuestionText("Stanford was founded in ____.");
+        question.setImageUrl(null);
+        question.setQuestionOrder(4);
+        question.setAnswers(Collections.singletonList("1891"));
+        int id = dao.addQuestion(question);
+
+        dao.deleteQuestion(id);
+
+        Question shouldBeNull = dao.getQuestion(id);
+        assertNull(shouldBeNull, "Question should be deleted");
+    }
+
+    @Test
+    public void testGetQuestionsForQuiz() throws Exception {
+        QuestionDAO dao = new QuestionDAO();
+
+        Question q1 = new Question();
+        q1.setQuizId(quizId);
+        q1.setQuestionType("question_response");
+        q1.setQuestionText("What's 2 + 2?");
+        q1.setImageUrl(null);
+        q1.setQuestionOrder(1);
+        q1.setAnswers(Collections.singletonList("4"));
+        dao.addQuestion(q1);
+
+        Question q2 = new Question();
+        q2.setQuizId(quizId);
+        q2.setQuestionType("multiple_choice");
+        q2.setQuestionText("Select a prime: ");
+        q2.setImageUrl(null);
+        q2.setQuestionOrder(2);
+        q2.setChoices(Arrays.asList(
+                new Choice("4", false),
+                new Choice("5", true),
+                new Choice("6", false)
+        ));
+        dao.addQuestion(q2);
+
+        List<Question> all = dao.getQuestionsForQuiz(quizId);
+        assertNotNull(all);
+        assertEquals(2, all.size());
+        assertTrue(all.stream().anyMatch(q -> "What's 2 + 2?".equals(q.getQuestionText())));
+        assertTrue(all.stream().anyMatch(q -> "Select a prime: ".equals(q.getQuestionText())));
+    }
+}
+

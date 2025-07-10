@@ -8,7 +8,6 @@ import java.util.List;
 
 public class QuestionDAO  {
 
-
     public int addQuestion(Question question) throws SQLException {
         String insertQuestionSQL = "INSERT INTO questions (quiz_id, question_type, question_text, image_url, question_order) VALUES (?, ?, ?, ?, ?);";
         Connection conn = null;
@@ -204,7 +203,7 @@ public class QuestionDAO  {
     }
 
     private void addAnswers(Connection conn, Question question) throws SQLException {
-        String sql = "INSERT INTO Youtubes (question_id, answer_text) VALUES (?, ?);";
+        String sql = "INSERT INTO question_answers (question_id, answer_text) VALUES (?, ?);";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             for (String answer : question.getAnswers()) {
                 stmt.setInt(1, question.getQuestionId());
@@ -234,7 +233,7 @@ public class QuestionDAO  {
     }
 
     private List<String> getAnswersForQuestion(Connection conn, int questionId) throws SQLException {
-        String sql = "SELECT answer_text FROM Youtubes WHERE question_id = ?;";
+        String sql = "SELECT answer_text FROM question_answers WHERE question_id = ?;";
         List<String> answers = new ArrayList<>();
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, questionId);
@@ -256,7 +255,7 @@ public class QuestionDAO  {
     }
 
     private void deleteAnswers(Connection conn, int questionId) throws SQLException {
-        String sql = "DELETE FROM Youtubes WHERE question_id = ?;";
+        String sql = "DELETE FROM question_answers WHERE question_id = ?;";
         try(PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, questionId);
             stmt.executeUpdate();
