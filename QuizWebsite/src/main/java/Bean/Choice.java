@@ -5,6 +5,7 @@ public class Choice {
     private int choiceId;
     private String choiceText;
     private boolean isCorrect;
+    private int questionId;
 
     // --- Constructors ---
 
@@ -49,5 +50,13 @@ public class Choice {
 
     public void setCorrect(boolean isCorrect) {
         this.isCorrect = isCorrect;
+    }
+
+    public void setQuestionId(int questionId) {
+        this.questionId = questionId;
+    }
+
+    public int getQuestionId() {
+        return questionId;
     }
 }
