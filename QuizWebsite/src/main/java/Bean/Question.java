@@ -1,10 +1,15 @@
 package Bean;
 
-public abstract class Question {
+public class Question {
     private int questionId;
     private int quizId;
     private String prompt;
     private int points;
+    private String questionType;
+
+    private String imageUrl;
+    private int questionOrder;
+
 
     public int getQuestionId() {
         return questionId;
@@ -30,4 +35,24 @@ public abstract class Question {
     public void setPoints(int points) {
         this.points = points;
     }
-} 
+
+    public String getQuestionType() {
+        return questionType;
+    }
+    public void setQuestionType(String questionType) {
+        this.questionType = questionType;
+    }
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setQuestionOrder(int questionOrder) {
+        this.questionOrder = questionOrder;
+    }
+    public int getQuestionOrder() {
+        return questionOrder;
+    }
+}
