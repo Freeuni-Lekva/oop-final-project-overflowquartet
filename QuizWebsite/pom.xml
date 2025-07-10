@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.example</groupId>
   <artifactId>QuizWebsite</artifactId>
@@ -28,38 +28,30 @@
       <artifactId>mysql-connector-java</artifactId>
       <version>8.0.30</version>
     </dependency>
-      <dependency>
-          <groupId>junit</groupId>
-          <artifactId>junit</artifactId>
-          <version>4.13.1</version>
-          <scope>test</scope>
-      </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.13.1</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
       <version>5.8.1</version>
       <scope>test</scope>
     </dependency>
+
+    <!-- JSTL for JSP tag libraries -->
     <dependency>
-      <groupId>org.apache.tomcat</groupId>
-      <artifactId>tomcat-servlet-api</artifactId>
-      <version>7.0.47</version>
+      <groupId>jakarta.servlet.jsp.jstl</groupId>
+      <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
+      <version>3.0.0</version>
     </dependency>
-<!--    <dependency>-->
-<!--      <groupId>javax.servlet</groupId>-->
-<!--      <artifactId>jstl</artifactId>-->
-<!--      <version>1.2</version>-->
-<!--    </dependency>-->
-<!--    <dependency>-->
-<!--      <groupId>jakarta.servlet.jsp.jstl</groupId>-->
-<!--      <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>-->
-<!--      <version>3.0.0</version>-->
-<!--    </dependency>-->
-<!--    <dependency>-->
-<!--      <groupId>org.glassfish.web</groupId>-->
-<!--      <artifactId>jakarta.servlet.jsp.jstl</artifactId>-->
-<!--      <version>3.0.0</version>-->
-<!--    </dependency>-->
+    <dependency>
+      <groupId>org.glassfish.web</groupId>
+      <artifactId>jakarta.servlet.jsp.jstl</artifactId>
+      <version>3.0.0</version>
+    </dependency>
 
 
   </dependencies>
