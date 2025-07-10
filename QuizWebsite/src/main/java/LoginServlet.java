@@ -1,12 +1,13 @@
-import java.io.IOException;
+import Bean.PasswordUtil;
+import Bean.User;
+import DB.UserDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import DB.UserDAO;
-import Bean.User;
-import Bean.PasswordUtil;
+
+import java.io.IOException;
 
 @WebServlet("/LoginServlet")
 public class LoginServlet extends HttpServlet {
