@@ -60,15 +60,16 @@
     <div class="collapse navbar-collapse" id="navMain">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
-            <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/quizzes">Quizzes</a></li>
-            <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/create">Create Quiz</a></li>
+            <li class="nav-item"><a class="nav-link" href="<%= request.getContextPath() %>/quizzes">Quizzes</a></li>
+            <li class="nav-item"><a class="nav-link" href="<%= request.getContextPath() %>/create">Create Quiz</a></li>
+            <li class="nav-item"><a class="nav-link" href="<%= request.getContextPath() %>/leaderboard.jsp">Leaderboard</a></li>
         </ul>
 
         <!-- show username if logged in -->
         <span class="navbar-text me-3">
         <!-- ${sessionScope.user.displayName} -->
       </span>
-        <a href="${pageContext.request.contextPath}/logout" class="btn btn-outline-light btn-sm">
+        <a href="<%= request.getContextPath() %>/LogoutServlet" class="btn btn-outline-light btn-sm">
             Log out
         </a>
     </div>
