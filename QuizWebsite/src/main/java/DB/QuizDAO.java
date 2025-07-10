@@ -5,10 +5,45 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Data Access Object for Quiz entities.
+ * Adds validation for owner existence, better error handling,
+ * and additional retrieval methods.
+ */
 public class QuizDAO {
 
-    public Integer createQuiz(int ownerId, String title, String description, boolean randomOrder, boolean multiplePages, boolean immediateCorrection) {
-        String sql = "INSERT INTO quizzes (owner_id, title, description, random_order, multiple_pages, immediate_correction) VALUES (?, ?, ?, ?, ?, ?)";
+    /**
+     * Checks whether a user with the given ID exists.
+     */
+    private boolean ownerExists(int ownerId) {
+        String sql = "SELECT 1 FROM users WHERE user_id = ?";
+        try (Connection conn = DBConnector.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, ownerId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            // Log or rethrow as needed
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Inserts a new Quiz, returning its generated ID, or null on failure or invalid owner.
+     */
+    public Integer createQuiz(int ownerId,
+                              String title,
+                              String description,
+                              boolean randomOrder,
+                              boolean multiplePages,
+                              boolean immediateCorrection) {
+        if (!ownerExists(ownerId)) {
+            return null;
+        }
+        String sql = "INSERT INTO quizzes (owner_id, title, description, random_order, multiple_pages, immediate_correction) "
+                + "VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnector.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, ownerId);
@@ -17,13 +52,34 @@ public class QuizDAO {
             ps.setBoolean(4, randomOrder);
             ps.setBoolean(5, multiplePages);
             ps.setBoolean(6, immediateCorrection);
+
             int affected = ps.executeUpdate();
             if (affected == 0) {
-                return null; // failed insert
+                return null;
             }
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
                     return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            // Handle specific constraint violations if desired
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Retrieves a Quiz by its ID.
+     */
+    public Quiz getQuizById(int quizId) {
+        String sql = "SELECT * FROM quizzes WHERE quiz_id = ?";
+        try (Connection conn = DBConnector.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, quizId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return extractQuiz(rs);
                 }
             }
         } catch (SQLException e) {
@@ -32,24 +88,35 @@ public class QuizDAO {
         return null;
     }
 
-
-    public Quiz getQuizById(int quizId) {
-        String sql = "SELECT * FROM quizzes WHERE quiz_id = ?";
+    /**
+     * Retrieves all quizzes owned by the given user.
+     */
+    public List<Quiz> getQuizzesByOwner(int ownerId) {
+        List<Quiz> list = new ArrayList<>();
+        String sql = "SELECT * FROM quizzes WHERE owner_id = ? ORDER BY creation_date DESC";
         try (Connection conn = DBConnector.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, quizId);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return extractQuiz(rs);
+            ps.setInt(1, ownerId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(extractQuiz(rs));
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
+        return list;
     }
 
+    /**
+     * Updates an existing quiz. Returns true if update was successful.
+     */
     public boolean updateQuiz(Quiz quiz) {
-        String sql = "UPDATE quizzes SET owner_id = ?, title = ?, description = ?, random_order = ?, multiple_pages = ?, immediate_correction = ? WHERE quiz_id = ?";
+        if (!ownerExists(quiz.getOwnerId())) {
+            return false;
+        }
+        String sql = "UPDATE quizzes SET owner_id = ?, title = ?, description = ?, random_order = ?, "
+                + "multiple_pages = ?, immediate_correction = ? WHERE quiz_id = ?";
         try (Connection conn = DBConnector.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, quiz.getOwnerId());
@@ -59,43 +126,52 @@ public class QuizDAO {
             ps.setBoolean(5, quiz.isMultiplePages());
             ps.setBoolean(6, quiz.isImmediateCorrection());
             ps.setInt(7, quiz.getQuizId());
-            int rows = ps.executeUpdate();
-            return rows > 0;
+
+            return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
     }
 
+    /**
+     * Deletes a quiz by ID. Returns true if deletion was successful.
+     */
     public boolean deleteQuiz(int quizId) {
         String sql = "DELETE FROM quizzes WHERE quiz_id = ?";
         try (Connection conn = DBConnector.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, quizId);
-            int rows = ps.executeUpdate();
-            return rows > 0;
+            return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
     }
 
+    /**
+     * Searches quizzes by title substring.
+     */
     public List<Quiz> searchQuizzes(String query) {
-        List<Quiz> quizzes = new ArrayList<>();
+        List<Quiz> list = new ArrayList<>();
         String sql = "SELECT * FROM quizzes WHERE title LIKE ?";
         try (Connection conn = DBConnector.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, "%" + query + "%");
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                quizzes.add(extractQuiz(rs));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(extractQuiz(rs));
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return quizzes;
+        return list;
     }
 
+    /**
+     * Helper to map a ResultSet row to a Quiz object.
+     */
     private Quiz extractQuiz(ResultSet rs) throws SQLException {
         Quiz quiz = new Quiz();
         quiz.setQuizId(rs.getInt("quiz_id"));
