@@ -89,10 +89,11 @@
 
 <main class="login-card p-4 p-md-5 text-white">
 
+
     <h1 class="h3 fw-bold mb-4 text-center">Log In</h1>
 
     <!-- ★ change action to your servlet/controller path -->
-    <form action="${pageContext.request.contextPath}/login" method="post" class="needs-validation" novalidate>
+    <form action="<%= request.getContextPath() %>/LoginServlet" method="post" class="needs-validation" novalidate>
         <div class="mb-3">
             <label for="username" class="form-label">Username</label>
             <input
@@ -115,6 +116,11 @@
                     required>
             <div class="invalid-feedback">Password required.</div>
         </div>
+        <% if (request.getAttribute("error") != null) { %>
+            <div class="alert alert-danger" role="alert">
+                <%= request.getAttribute("error") %>
+            </div>
+        <% } %>
 
 <%--        <div class="d-flex justify-content-between align-items-center mb-4">--%>
 <%--            <div class="form-check">--%>
