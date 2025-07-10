@@ -7,22 +7,31 @@ import java.util.List;
 
 public class QuizDAO {
 
-    public boolean createQuiz(int ownerId, String title, String description, boolean randomOrder, boolean multiplePages, boolean immediateCorrection) {
+    public Integer createQuiz(int ownerId, String title, String description, boolean randomOrder, boolean multiplePages, boolean immediateCorrection) {
         String sql = "INSERT INTO quizzes (owner_id, title, description, random_order, multiple_pages, immediate_correction) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnector.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, ownerId);
             ps.setString(2, title);
             ps.setString(3, description);
             ps.setBoolean(4, randomOrder);
             ps.setBoolean(5, multiplePages);
             ps.setBoolean(6, immediateCorrection);
-            ps.executeUpdate();
-            return true;
+            int affected = ps.executeUpdate();
+            if (affected == 0) {
+                return null; // failed insert
+            }
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
         } catch (SQLException e) {
-            return false;
+            e.printStackTrace();
         }
+        return null;
     }
+
 
     public Quiz getQuizById(int quizId) {
         String sql = "SELECT * FROM quizzes WHERE quiz_id = ?";
@@ -99,4 +108,4 @@ public class QuizDAO {
         quiz.setCreationDate(rs.getTimestamp("creation_date"));
         return quiz;
     }
-} 
+}
