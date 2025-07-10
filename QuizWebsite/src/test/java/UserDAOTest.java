@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -118,5 +119,51 @@ public class UserDAOTest {
         userDAO.registerUser("Kate1", "hash1", "Kate rine One");
         List<User> users = userDAO.searchUsers("nonexistent");
         assertTrue(users.isEmpty());
+    }
+    @Test
+    void testUserIdGetterSetter() {
+        User user = new User();
+        user.setUserId(42);
+        assertEquals(42, user.getUserId());
+    }
+
+    @Test
+    void testUsernameGetterSetter() {
+        User user = new User();
+        String username = "testUser";
+        user.setUsername(username);
+        assertEquals(username, user.getUsername());
+    }
+
+    @Test
+    void testPasswordHashGetterSetter() {
+        User user = new User();
+        String hash = "abc123hash";
+        user.setPasswordHash(hash);
+        assertEquals(hash, user.getPasswordHash());
+    }
+
+    @Test
+    void testDisplayNameGetterSetter() {
+        User user = new User();
+        String displayName = "Test User";
+        user.setDisplayName(displayName);
+        assertEquals(displayName, user.getDisplayName());
+    }
+
+    @Test
+    void testCreatedAtGetterSetter() {
+        User user = new User();
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        user.setCreatedAt(now);
+        assertEquals(now, user.getCreatedAt());
+    }
+
+    @Test
+    void testLastLoginGetterSetter() {
+        User user = new User();
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        user.setLastLogin(now);
+        assertEquals(now, user.getLastLogin());
     }
 }
