@@ -207,4 +207,20 @@ public class QuizDAO {
         quiz.setCreationDate(rs.getTimestamp("creation_date"));
         return quiz;
     }
+
+    public List<Quiz> getAllQuizzes() {
+        List<Quiz> list = new ArrayList<>();
+        String sql = "SELECT * FROM quizzes ORDER BY creation_date DESC";
+        try (Connection conn = DBConnector.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(extractQuiz(rs));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 }
