@@ -2,7 +2,7 @@ package Servlets;
 
 import DB.UserDAO;
 import Bean.User;
-import Utils.PasswordUtil;
+import Bean.PasswordUtil;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
