@@ -13,10 +13,12 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 
+import jakarta.servlet.annotation.WebServlet;
+@WebServlet("/RegisterServlet")
 public class RegisterServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        RequestDispatcher dispatcher = req.getRequestDispatcher("register.jsp");
+        RequestDispatcher dispatcher = req.getRequestDispatcher("create_account.jsp");
         dispatcher.forward(req, resp);
     }
 
@@ -28,7 +30,7 @@ public class RegisterServlet extends HttpServlet {
         UserDAO userDAO = new UserDAO();
         if (userDAO.getUserByUsername(username) != null) {
             req.setAttribute("error", "Username already exists");
-            RequestDispatcher dispatcher = req.getRequestDispatcher("register.jsp");
+            RequestDispatcher dispatcher = req.getRequestDispatcher("create_account.jsp");
             dispatcher.forward(req, resp);
             return;
         }
@@ -36,6 +38,6 @@ public class RegisterServlet extends HttpServlet {
         userDAO.registerUser(username, passwordHash, displayName);
         User user = userDAO.getUserByUsername(username);
         req.getSession().setAttribute("user", user);
-        resp.sendRedirect(req.getContextPath() + "/home");
+        resp.sendRedirect(req.getContextPath() + "/HomeServlet");
     }
 } 
