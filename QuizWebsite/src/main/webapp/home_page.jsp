@@ -63,6 +63,7 @@
             <li class="nav-item"><a class="nav-link" href="<%= request.getContextPath() %>/quizzes">Quizzes</a></li>
             <li class="nav-item"><a class="nav-link" href="<%= request.getContextPath() %>/create">Create Quiz</a></li>
             <li class="nav-item"><a class="nav-link" href="<%= request.getContextPath() %>/leaderboard.jsp">Leaderboard</a></li>
+            <li class="nav-item"><a class="nav-link" href="<%= request.getContextPath() %>/friends.jsp">Friends</a></li>
 
         </ul>
 
