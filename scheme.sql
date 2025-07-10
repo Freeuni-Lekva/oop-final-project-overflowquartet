@@ -110,6 +110,21 @@ CREATE TABLE messages (
                           FOREIGN KEY (receiver_id) REFERENCES users(user_id)
 );
 
+CREATE TABLE answers (
+                         answer_id INT AUTO_INCREMENT PRIMARY KEY,
+                         question_id INT NOT NULL,
+                         user_id     INT NOT NULL,
+                         response_text       TEXT,
+                         response_option_id  INT NULL,
+                         timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                         FOREIGN KEY (question_id)       REFERENCES questions(question_id)
+                             ON DELETE CASCADE
+                             ON UPDATE CASCADE,
+                         FOREIGN KEY (user_id)           REFERENCES users(user_id)
+                             ON DELETE CASCADE
+                             ON UPDATE CASCADE
+);
+
 -- Sample users for testing login
 INSERT INTO users (username, password_hash, display_name) VALUES
 ('alice', '4e40e8ffe0ee32fa53e139147ed559229a5930f89c2204706fc174beb36210b3', 'Alice Wonderland'),
