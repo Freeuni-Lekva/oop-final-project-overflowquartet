@@ -202,7 +202,7 @@
 
 <!-- ─── FOOTER ──────────────────────────────────────────────────────── -->
 <footer class="text-center py-3">
-    © 2025 QuizSite · Made with <i class="bi bi-heart-fill"></i> by OverflowQuartet
+     2025 QuizMossis · Made with <i class="bi bi-heart-fill"></i> by OverflowQuartet
 </footer>
 
 <!-- Bootstrap JS -->

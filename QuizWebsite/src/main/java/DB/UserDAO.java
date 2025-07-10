@@ -101,4 +101,22 @@ public class UserDAO {
         user.setLastLogin(rs.getTimestamp("last_login"));
         return user;
     }
+    public List<User> searchUsersByUsernameOrDisplayName(String query, int excludeUserId) {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT * FROM users WHERE (username LIKE ? OR display_name LIKE ?) AND user_id <> ?";
+        try (Connection conn = DBConnector.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, "%" + query + "%");
+            ps.setString(2, "%" + query + "%");
+            ps.setInt(3, excludeUserId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                users.add(extractUser(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return users;
+    }
+
 }
