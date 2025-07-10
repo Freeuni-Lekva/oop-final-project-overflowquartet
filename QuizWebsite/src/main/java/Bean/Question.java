@@ -17,8 +17,7 @@ public class Question {
     // Added to hold options for 'multiple_choice' questions
     private List<Choice> choices;
 
-    // NOTE: The 'points' field was removed as it does not exist in the 'questions' table schema.
-    // If you need it, you must add an 'INT' column to your 'questions' table.
+
 
     public int getQuestionId() {
         return questionId;
