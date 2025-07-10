@@ -1,3 +1,5 @@
+package Servlets;
+
 import Bean.PasswordUtil;
 import Bean.User;
 import DB.UserDAO;
