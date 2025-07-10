@@ -109,3 +109,8 @@ CREATE TABLE messages (
                           FOREIGN KEY (sender_id) REFERENCES users(user_id),
                           FOREIGN KEY (receiver_id) REFERENCES users(user_id)
 );
+
+-- Sample users for testing login
+INSERT INTO users (username, password_hash, display_name) VALUES
+('alice', '4e40e8ffe0ee32fa53e139147ed559229a5930f89c2204706fc174beb36210b3', 'Alice Wonderland'),
+('charlie', '2c1743a391305fbf367df8e4f069f9f9a44fbdc7e6a8e6a8e6a8e6a8e6a8e6a8e', 'Charlie Chaplin');

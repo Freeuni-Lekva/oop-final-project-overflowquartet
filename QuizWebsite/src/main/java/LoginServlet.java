@@ -1,0 +1,33 @@
+import java.io.IOException;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import DB.UserDAO;
+import Bean.User;
+import Bean.PasswordUtil;
+
+@WebServlet("/LoginServlet")
+public class LoginServlet extends HttpServlet {
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+        String hashedPassword = PasswordUtil.hashPassword(password);
+        UserDAO userDAO = new UserDAO();
+        User user = userDAO.authenticateUser(username, hashedPassword);
+        if (user != null) {
+            request.getSession().setAttribute("user", user);
+            response.sendRedirect("quiz_main.jsp");
+        } else {
+            request.setAttribute("error", "Invalid username or password");
+            request.getRequestDispatcher("index.jsp").forward(request, response);
+        }
+    }
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.sendRedirect("index.jsp");
+    }
+
+}
