@@ -1,3 +1,5 @@
+package Servlets;
+
 import Bean.PasswordUtil;
 import Bean.User;
 import DB.UserDAO;
@@ -20,7 +22,10 @@ public class LoginServlet extends HttpServlet {
         User user = userDAO.authenticateUser(username, hashedPassword);
         if (user != null) {
             request.getSession().setAttribute("user", user);
-            response.sendRedirect("quiz_main.jsp");
+
+
+            response.sendRedirect("HomeServlet");
+
         } else {
             request.setAttribute("error", "Invalid username or password");
             request.getRequestDispatcher("index.jsp").forward(request, response);

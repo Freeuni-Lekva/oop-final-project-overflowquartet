@@ -79,7 +79,7 @@
 <main class="login-card p-4 p-md-5 text-white">
   <h1 class="h3 fw-bold mb-4 text-center">Create Account</h1>
 
-  <form action="${pageContext.request.contextPath}/register"
+  <form action="<%= request.getContextPath() %>/RegisterServlet"
         method="post"
         class="needs-validation"
         novalidate>
@@ -139,7 +139,7 @@
     <p class="text-center small mb-0 mt-3">
       Already have an account?
       <a
-              href="${pageContext.request.contextPath}/login"
+              href="<%= request.getContextPath() %>/LoginServlet"
               class="fw-semibold link-light link-underline-opacity-0 signup-link">
         Log in
       </a>

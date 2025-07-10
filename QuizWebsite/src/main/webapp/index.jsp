@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -89,10 +90,10 @@
 
 <main class="login-card p-4 p-md-5 text-white">
 
-
     <h1 class="h3 fw-bold mb-4 text-center">Log In</h1>
 
     <!-- ★ change action to your servlet/controller path -->
+
     <form action="<%= request.getContextPath() %>/LoginServlet" method="post" class="needs-validation" novalidate>
         <div class="mb-3">
             <label for="username" class="form-label">Username</label>
@@ -121,7 +122,6 @@
                 <%= request.getAttribute("error") %>
             </div>
         <% } %>
-
 <%--        <div class="d-flex justify-content-between align-items-center mb-4">--%>
 <%--            <div class="form-check">--%>
 <%--                <input class="form-check-input" type="checkbox" id="remember" name="remember">--%>
@@ -136,7 +136,7 @@
 
         <p class="text-center small mb-0">
             New here?
-            <a href="${pageContext.request.contextPath}/register" class="fw-semibold link-light link-underline-opacity-0">
+            <a href="<%= request.getContextPath() %>/RegisterServlet" class="fw-semibold link-light link-underline-opacity-0">
                 Create an account
             </a>
         </p>

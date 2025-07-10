@@ -170,6 +170,29 @@ public class QuizDAO {
     }
 
     /**
+     * Retrieves all quizzes with their question counts (for featured quizzes).
+     */
+    public List<Quiz> getAllQuizzesWithQuestionCount() {
+        List<Quiz> list = new ArrayList<>();
+        String sql = "SELECT q.*, COUNT(ques.question_id) AS question_count " +
+                     "FROM quizzes q LEFT JOIN questions ques ON q.quiz_id = ques.quiz_id " +
+                     "GROUP BY q.quiz_id ORDER BY q.creation_date DESC";
+        try (Connection conn = DBConnector.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Quiz quiz = extractQuiz(rs);
+                    quiz.setQuestionCount(rs.getInt("question_count"));
+                    list.add(quiz);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    /**
      * Helper to map a ResultSet row to a Quiz object.
      */
     private Quiz extractQuiz(ResultSet rs) throws SQLException {
@@ -183,5 +206,21 @@ public class QuizDAO {
         quiz.setImmediateCorrection(rs.getBoolean("immediate_correction"));
         quiz.setCreationDate(rs.getTimestamp("creation_date"));
         return quiz;
+    }
+
+    public List<Quiz> getAllQuizzes() {
+        List<Quiz> list = new ArrayList<>();
+        String sql = "SELECT * FROM quizzes ORDER BY creation_date DESC";
+        try (Connection conn = DBConnector.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(extractQuiz(rs));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 }
