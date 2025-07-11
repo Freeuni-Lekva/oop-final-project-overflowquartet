@@ -210,5 +210,13 @@
         });
     });
 </script>
+<script>
+// Force reload on back navigation to prevent showing cached content after logout
+window.addEventListener('pageshow', function(event) {
+    if (event.persisted) {
+        window.location.reload();
+    }
+});
+</script>
 </body>
 </html> 
