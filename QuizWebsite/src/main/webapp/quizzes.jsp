@@ -79,9 +79,15 @@
       <div class="col-12 col-sm-6 col-lg-4">
         <div class="glass-card p-4 h-100 d-flex flex-column">
           <h5 class="fw-semibold mb-1">
-            <i class="bi bi-lightbulb-fill me-1"></i> ${quiz.title}
+            <i class="bi bi-lightbulb-fill me-1"></i> 
+            <a href="<%= request.getContextPath() %>/quiz-summary?quizId=${quiz.quizId}" class="link-light text-decoration-none">
+              ${quiz.title}
+            </a>
           </h5>
           <p class="small flex-grow-1">${quiz.description}</p>
+          <p class="small text-light mb-2">
+            <i class="bi bi-person-circle me-1"></i> by ${quiz.ownerUsername}
+          </p>
           <div class="d-flex justify-content-between align-items-center mt-2">
   <span class="small">
     <i class="bi bi-question-circle"></i> ${quiz.questionCount} Qs
