@@ -242,12 +242,12 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-// Force reload on back navigation to prevent showing cached content after logout
-window.addEventListener('pageshow', function(event) {
+  // Force reload on back navigation to prevent showing cached content after logout
+  window.addEventListener('pageshow', function(event) {
     if (event.persisted) {
-        window.location.reload();
+      window.location.reload();
     }
-});
+  });
 </script>
 </body>
 </html>

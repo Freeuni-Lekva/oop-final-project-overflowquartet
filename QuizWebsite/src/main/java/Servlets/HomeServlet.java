@@ -24,21 +24,21 @@ public class HomeServlet extends HttpServlet {
         private final QuizAttempt attempt;
         private final Quiz quiz;
         private final User user;
-        
+
         public AttemptWithQuiz(QuizAttempt a, Quiz q, User u) {
             this.attempt = a;
             this.quiz    = q;
             this.user    = u;
         }
-        
+
         public QuizAttempt getAttempt() {
             return attempt;
         }
-        
+
         public Quiz getQuiz() {
             return quiz;
         }
-        
+
         public User getUser() {
             return user;
         }
@@ -71,6 +71,9 @@ public class HomeServlet extends HttpServlet {
         req.setAttribute("featuredQuizzes", featuredQuizzes);
 
         // 2) Your name for greeting
+        // MessageDAO messageDAO = new MessageDAO();
+        int unreadCount = messageDAO.countUnread(userId);
+        req.setAttribute("unreadCount", unreadCount);
         req.setAttribute("userDisplayName", currentUser.getDisplayName());
 
         // 3) Quizzes you created

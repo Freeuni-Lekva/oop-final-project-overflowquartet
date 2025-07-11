@@ -1,5 +1,7 @@
 package DB;
 
+import Bean.User;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -215,8 +217,6 @@ public class FriendsDAO {
             throw new IllegalArgumentException("User IDs must be different");
         }
     }
-
-
 
     /**
      * Possible statuses in the friends table.
