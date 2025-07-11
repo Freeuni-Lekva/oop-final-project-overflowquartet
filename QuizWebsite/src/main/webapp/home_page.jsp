@@ -90,7 +90,8 @@
                                     <a href="${ctx}/quiz?id=${q.quizId}" class="link-light fw-semibold">
                                             ${q.title}
                                     </a>
-                                </li>
+                                    <span class="small ms-2">by <a href="${ctx}/profile?id=${q.ownerId}" class="link-light">${q.ownerUsername}</a></span>
+                                </li>   
                             </c:forEach>
                         </ul>
                     </c:otherwise>
@@ -161,6 +162,7 @@
                     <div class="glass-card p-4 h-100 d-flex flex-column">
                         <h5 class="fw-semibold mb-1">
                             <i class="bi bi-lightbulb-fill me-1"></i> ${quiz.title}
+                            <span class="small ms-2">by <a href="${ctx}/profile?id=${quiz.ownerId}" class="link-light">${quiz.ownerUsername}</a></span>
                         </h5>
                         <p class="small flex-grow-1">${quiz.description}</p>
                         <div class="d-flex justify-content-between align-items-center mt-2">
