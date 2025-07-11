@@ -91,6 +91,7 @@
               <i class="bi ${ach.iconUrl} fs-2" style="color:#ffd700;"></i>
             </span>
           </c:forEach>
+
           <c:if test="${empty userAchievements}">
             <div class="rounded-pill px-3 py-2 d-flex align-items-center justify-content-center" style="background:rgba(255,255,255,0.10); min-width:220px;">
               <i class="bi bi-patch-check-fill me-2 fs-4" style="color:#ffe066;"></i>
