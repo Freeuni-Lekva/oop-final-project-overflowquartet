@@ -93,6 +93,36 @@
                     <option value="multiple_choice">Multiple Choice</option>
                 </select>
             </div>
+            <!-- Image URL field for picture response questions -->
+            <div class="mb-3 d-none" id="imageUrlField">
+                <label for="imageUrl" class="form-label">Image URL</label>
+                <div class="input-group">
+                    <input type="url" class="form-control" id="imageUrl" name="imageUrl" 
+                           placeholder="https://example.com/image.jpg" 
+                           pattern="https?://.+">
+                    <button type="button" class="btn btn-outline-light" id="previewBtn" onclick="previewImage()">
+                        <i class="bi bi-eye"></i> Preview
+                    </button>
+                </div>
+                <div class="form-text text-light">Enter the full URL of the image (must start with http:// or https://)</div>
+                
+                <!-- Image Preview Section -->
+                <div class="mt-3 d-none" id="imagePreviewSection">
+                    <label class="form-label">Image Preview:</label>
+                    <div class="text-center p-3" style="background: rgba(255, 255, 255, 0.1); border-radius: 0.5rem;">
+                        <img id="previewImage" src="" alt="Preview" 
+                             class="img-fluid rounded question-image" 
+                             style="max-height: 300px; max-width: 100%;"
+                             onerror="handlePreviewError()">
+                        <div id="previewError" class="alert alert-warning mt-2" style="display: none;">
+                            <i class="bi bi-exclamation-triangle"></i> Sorry, we couldn't load the image. Please check the URL and try again.
+                        </div>
+                        <div id="previewSuccess" class="alert alert-success mt-2" style="display: none;">
+                            <i class="bi bi-check-circle"></i> Image loaded successfully!
+                        </div>
+                    </div>
+                </div>
+            </div>
             <!-- Short Answer Answers -->
             <div class="mb-3" id="shortAnswerFields">
                 <label class="form-label" id="answerLabel">Acceptable Answers (one per line)</label>
@@ -154,19 +184,35 @@
         var answerTextarea = shortAnswerFields.querySelector('textarea[name="answerText"]');
         var mcFields = document.getElementById('mcFields');
         var mcInputs = mcFields.querySelectorAll('input, textarea, select');
+        var imageUrlField = document.getElementById('imageUrlField');
+        var imageUrlInput = document.getElementById('imageUrl');
 
         if (type === 'multiple_choice') {
             shortAnswerFields.classList.add('d-none');
             answerTextarea.required = false;
             mcFields.classList.remove('d-none');
+            imageUrlField.classList.add('d-none');
+            imageUrlInput.required = false;
             // Enable all MC inputs
             mcInputs.forEach(function(input) {
                 input.disabled = false;
+            });
+        } else if (type === 'picture_response') {
+            shortAnswerFields.classList.remove('d-none');
+            answerTextarea.required = true;
+            mcFields.classList.add('d-none');
+            imageUrlField.classList.remove('d-none');
+            imageUrlInput.required = true;
+            // Disable all MC inputs so they don't block validation
+            mcInputs.forEach(function(input) {
+                input.disabled = true;
             });
         } else {
             shortAnswerFields.classList.remove('d-none');
             answerTextarea.required = true;
             mcFields.classList.add('d-none');
+            imageUrlField.classList.add('d-none');
+            imageUrlInput.required = false;
             // Disable all MC inputs so they don't block validation
             mcInputs.forEach(function(input) {
                 input.disabled = true;
@@ -192,6 +238,58 @@
             '<input type="text" class="form-control" name="choiceText" placeholder="Choice ' + (idx+1) + '" required>';
         document.getElementById('mcChoices').appendChild(div);
     }
+    
+    function previewImage() {
+        var imageUrl = document.getElementById('imageUrl').value.trim();
+        var previewSection = document.getElementById('imagePreviewSection');
+        var previewImage = document.getElementById('previewImage');
+        var previewError = document.getElementById('previewError');
+        var previewSuccess = document.getElementById('previewSuccess');
+        var previewBtn = document.getElementById('previewBtn');
+        
+        if (!imageUrl) {
+            alert('Please enter an image URL first.');
+            return;
+        }
+        
+        if (!imageUrl.match(/^https?:\/\/.+/)) {
+            alert('Please enter a valid URL starting with http:// or https://');
+            return;
+        }
+        
+        // Show loading state
+        previewBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Loading...';
+        previewBtn.disabled = true;
+        
+        // Hide previous messages
+        previewError.style.display = 'none';
+        previewSuccess.style.display = 'none';
+        
+        // Show preview section
+        previewSection.classList.remove('d-none');
+        
+        // Set image source
+        previewImage.src = imageUrl;
+        
+        // Add load event listener
+        previewImage.onload = function() {
+            previewSuccess.style.display = 'block';
+            previewError.style.display = 'none';
+            previewBtn.innerHTML = '<i class="bi bi-eye"></i> Preview';
+            previewBtn.disabled = false;
+        };
+    }
+    
+    function handlePreviewError() {
+        var previewError = document.getElementById('previewError');
+        var previewSuccess = document.getElementById('previewSuccess');
+        var previewBtn = document.getElementById('previewBtn');
+        
+        previewError.style.display = 'block';
+        previewSuccess.style.display = 'none';
+        previewBtn.innerHTML = '<i class="bi bi-eye"></i> Preview';
+        previewBtn.disabled = false;
+    }
     // On page load, set correct fields
     document.addEventListener('DOMContentLoaded', function() {
         toggleTypeFields();
@@ -207,6 +305,46 @@
                     answerTextarea.classList.remove('is-invalid');
                 }
             }
+            
+            // Validate image URL for picture response questions
+            if (type === 'picture_response') {
+                var imageUrlInput = document.getElementById('imageUrl');
+                if (!imageUrlInput.value.trim()) {
+                    imageUrlInput.classList.add('is-invalid');
+                    e.preventDefault();
+                } else if (!imageUrlInput.checkValidity()) {
+                    imageUrlInput.classList.add('is-invalid');
+                    e.preventDefault();
+                } else {
+                    imageUrlInput.classList.remove('is-invalid');
+                }
+            }
+        });
+        
+        // Auto-preview when user pastes or finishes typing a URL
+        var imageUrlInput = document.getElementById('imageUrl');
+        var previewTimeout;
+        
+        imageUrlInput.addEventListener('input', function() {
+            clearTimeout(previewTimeout);
+            previewTimeout = setTimeout(function() {
+                var url = imageUrlInput.value.trim();
+                if (url && url.match(/^https?:\/\/.+/)) {
+                    // Auto-preview after 1 second of no typing
+                    previewImage();
+                }
+            }, 1000);
+        });
+        
+        imageUrlInput.addEventListener('paste', function() {
+            clearTimeout(previewTimeout);
+            previewTimeout = setTimeout(function() {
+                var url = imageUrlInput.value.trim();
+                if (url && url.match(/^https?:\/\/.+/)) {
+                    // Auto-preview after paste
+                    previewImage();
+                }
+            }, 500);
         });
     });
 </script>

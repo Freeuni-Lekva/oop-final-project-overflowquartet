@@ -56,11 +56,13 @@ public class AddQuestionsServlet extends HttpServlet {
         }
         String questionText = req.getParameter("questionText");
         String questionType = req.getParameter("questionType");
+        String imageUrl = req.getParameter("imageUrl");
 
         Question question = new Question();
         question.setQuizId(quizId);
         question.setQuestionText(questionText);
         question.setQuestionType(questionType);
+        question.setImageUrl(imageUrl);
         question.setQuestionOrder(0);
 
         boolean valid = true;
@@ -98,6 +100,17 @@ public class AddQuestionsServlet extends HttpServlet {
                 error = "Please provide at least one answer.";
             }
             question.setAnswers(answers);
+            
+            // Additional validation for picture_response questions
+            if ("picture_response".equals(questionType)) {
+                if (imageUrl == null || imageUrl.trim().isEmpty()) {
+                    valid = false;
+                    error = "Please provide an image URL for picture response questions.";
+                } else if (!imageUrl.trim().startsWith("http://") && !imageUrl.trim().startsWith("https://")) {
+                    valid = false;
+                    error = "Image URL must start with http:// or https://";
+                }
+            }
         }
 
         if (!valid) {
