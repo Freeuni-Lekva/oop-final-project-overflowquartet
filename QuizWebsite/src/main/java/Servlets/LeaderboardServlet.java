@@ -70,9 +70,10 @@ public class LeaderboardServlet extends HttpServlet {
     private List<LeaderboardEntry> getLeaderboardData(String quizIdParam, String timeframe) {
         List<LeaderboardEntry> leaderboard = new ArrayList<>();
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT u.username, qa.score, qa.duration_seconds, qa.attempt_date, u.user_id ");
+        sql.append("SELECT u.username, qa.score, qa.duration_seconds, qa.attempt_date, u.user_id, q.title, qa.quiz_id ");
         sql.append("FROM quiz_attempts qa ");
         sql.append("JOIN users u ON qa.user_id = u.user_id ");
+        sql.append("JOIN quizzes q ON qa.quiz_id = q.quiz_id ");
         sql.append("WHERE 1=1 ");
 
         List<Object> params = new ArrayList<>();
@@ -113,6 +114,8 @@ public class LeaderboardServlet extends HttpServlet {
                     entry.setDurationSeconds(rs.getInt("duration_seconds"));
                     entry.setAttemptDate(rs.getTimestamp("attempt_date"));
                     entry.setUserId(rs.getInt("user_id"));
+                    entry.setQuizTitle(rs.getString("title"));
+                    entry.setQuizId(rs.getInt("quiz_id"));
                     leaderboard.add(entry);
                 }
             }
@@ -128,9 +131,10 @@ public class LeaderboardServlet extends HttpServlet {
      */
     private LeaderboardEntry getUserPersonalBest(int userId, String quizIdParam, String timeframe) {
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT u.username, qa.score, qa.duration_seconds, qa.attempt_date, u.user_id ");
+        sql.append("SELECT u.username, qa.score, qa.duration_seconds, qa.attempt_date, u.user_id, q.title, qa.quiz_id ");
         sql.append("FROM quiz_attempts qa ");
         sql.append("JOIN users u ON qa.user_id = u.user_id ");
+        sql.append("JOIN quizzes q ON qa.quiz_id = q.quiz_id ");
         sql.append("WHERE qa.user_id = ? ");
         List<Object> params = new ArrayList<>();
         params.add(userId);
@@ -169,6 +173,8 @@ public class LeaderboardServlet extends HttpServlet {
                     entry.setDurationSeconds(rs.getInt("duration_seconds"));
                     entry.setAttemptDate(rs.getTimestamp("attempt_date"));
                     entry.setUserId(rs.getInt("user_id"));
+                    entry.setQuizTitle(rs.getString("title"));
+                    entry.setQuizId(rs.getInt("quiz_id"));
                     return entry;
                 }
             }
@@ -185,6 +191,8 @@ public class LeaderboardServlet extends HttpServlet {
         private int durationSeconds;
         private Timestamp attemptDate;
         private int userId;
+        private String quizTitle;
+        private int quizId;
 
         public String getUsername() { return username; }
         public void setUsername(String username) { this.username = username; }
@@ -196,5 +204,9 @@ public class LeaderboardServlet extends HttpServlet {
         public void setAttemptDate(Timestamp attemptDate) { this.attemptDate = attemptDate; }
         public int getUserId() { return userId; }
         public void setUserId(int userId) { this.userId = userId; }
+        public String getQuizTitle() { return quizTitle; }
+        public void setQuizTitle(String quizTitle) { this.quizTitle = quizTitle; }
+        public int getQuizId() { return quizId; }
+        public void setQuizId(int quizId) { this.quizId = quizId; }
     }
 }

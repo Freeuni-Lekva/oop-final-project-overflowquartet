@@ -18,6 +18,24 @@ public class FriendsServlet extends HttpServlet {
     private FriendsDAO friendsDAO = new FriendsDAO();
     private UserDAO userDAO = new UserDAO(); // You'll need to implement this if not present
 
+    // Helper class to hold user info with friendship status
+    public static class UserWithFriendshipStatus {
+        private User user;
+        private String friendshipStatus; // "friend", "pending_sent", "pending_received", "none"
+        
+        public UserWithFriendshipStatus(User user, String status) {
+            this.user = user;
+            this.friendshipStatus = status;
+        }
+        
+        public User getUser() { return user; }
+        public String getFriendshipStatus() { return friendshipStatus; }
+        public boolean isFriend() { return "friend".equals(friendshipStatus); }
+        public boolean isPendingSent() { return "pending_sent".equals(friendshipStatus); }
+        public boolean isPendingReceived() { return "pending_received".equals(friendshipStatus); }
+        public boolean isNone() { return "none".equals(friendshipStatus); }
+    }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -66,14 +84,30 @@ public class FriendsServlet extends HttpServlet {
         }
         request.setAttribute("pendingSent", pendingSent);
 
-        // 4. Optional: Users you can send requests to (not already friends or pending)
-        // Not required for basic, but can implement "search" or "suggested friends"
-
-        // Optionally: Support search for users
+        // 4. Search for users with friendship status
         String search = request.getParameter("search");
         if (search != null && !search.trim().isEmpty()) {
             List<User> searchResults = userDAO.searchUsersByUsernameOrDisplayName(search.trim(), userId);
-            request.setAttribute("searchResults", searchResults);
+            List<UserWithFriendshipStatus> searchResultsWithStatus = new ArrayList<>();
+            
+            // Get all friend IDs for quick lookup
+            List<Integer> friendIds = friendsDAO.getFriendIds(userId, FriendsDAO.FriendStatus.ACCEPTED);
+            List<Integer> pendingSentIdsList = friendsDAO.getFriendIds(userId, FriendsDAO.FriendStatus.PENDING);
+            List<Integer> pendingReceivedIdsList = friendsDAO.getPendingRequestsForUser(userId);
+            
+            for (User user : searchResults) {
+                String status = "none";
+                if (friendIds.contains(user.getUserId())) {
+                    status = "friend";
+                } else if (pendingSentIdsList.contains(user.getUserId())) {
+                    status = "pending_sent";
+                } else if (pendingReceivedIdsList.contains(user.getUserId())) {
+                    status = "pending_received";
+                }
+                searchResultsWithStatus.add(new UserWithFriendshipStatus(user, status));
+            }
+            
+            request.setAttribute("searchResults", searchResultsWithStatus);
         }
 
         request.getRequestDispatcher("/friends.jsp").forward(request, response);

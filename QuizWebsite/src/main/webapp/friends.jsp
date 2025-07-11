@@ -62,10 +62,10 @@
         <a class="nav-link" href="<%= request.getContextPath() %>/create"><i class="bi bi-plus-circle"></i> Create Quiz</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="<%= request.getContextPath() %>/leaderboard.jsp"><i class="bi bi-trophy-fill"></i> Leaderboard</a>
+        <a class="nav-link" href="<%= request.getContextPath() %>/leaderboard"><i class="bi bi-trophy-fill"></i> Leaderboard</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link active fw-semibold" href="#"><i class="bi bi-people-fill"></i> Friends</a>
+        <a class="nav-link active fw-semibold" href="<%= request.getContextPath() %>/friends"><i class="bi bi-people-fill"></i> Friends</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="<%= request.getContextPath() %>/messages"><i class="bi bi-envelope-fill"></i> Messages</a>
@@ -191,19 +191,40 @@
     </form>
     <c:if test="${not empty searchResults}">
       <ul class="list-group mb-3">
-        <c:forEach var="user" items="${searchResults}">
+        <c:forEach var="userWithStatus" items="${searchResults}">
           <li class="list-group-item d-flex align-items-center justify-content-between bg-transparent text-light">
                         <span>
                             <i class="bi bi-person-circle me-2"></i>
-                            <a href="${pageContext.request.contextPath}/profile?id=${user.userId}" class="link-light">
-                                <b>${user.username}</b>
+                            <a href="${pageContext.request.contextPath}/profile?id=${userWithStatus.user.userId}" class="link-light">
+                                <b>${userWithStatus.user.username}</b>
                             </a>
                         </span>
-            <form method="post" action="${pageContext.request.contextPath}/friends" class="mb-0">
-              <input type="hidden" name="action" value="send"/>
-              <input type="hidden" name="targetId" value="${user.userId}"/>
-              <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-person-plus"></i> Add Friend</button>
-            </form>
+            <c:choose>
+              <c:when test="${userWithStatus.friend}">
+                <span class="badge bg-success"><i class="bi bi-check-circle"></i> Already Friends</span>
+              </c:when>
+              <c:when test="${userWithStatus.pendingSent}">
+                <span class="badge bg-warning text-dark"><i class="bi bi-clock"></i> Request Sent</span>
+              </c:when>
+              <c:when test="${userWithStatus.pendingReceived}">
+                <form method="post" action="${pageContext.request.contextPath}/friends" class="mb-0 d-flex gap-2">
+                  <input type="hidden" name="targetId" value="${userWithStatus.user.userId}"/>
+                  <button name="action" value="accept" type="submit" class="btn btn-success btn-sm">
+                    <i class="bi bi-check"></i> Accept
+                  </button>
+                  <button name="action" value="reject" type="submit" class="btn btn-outline-danger btn-sm">
+                    <i class="bi bi-x"></i> Reject
+                  </button>
+                </form>
+              </c:when>
+              <c:otherwise>
+                <form method="post" action="${pageContext.request.contextPath}/friends" class="mb-0">
+                  <input type="hidden" name="action" value="send"/>
+                  <input type="hidden" name="targetId" value="${userWithStatus.user.userId}"/>
+                  <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-person-plus"></i> Add Friend</button>
+                </form>
+              </c:otherwise>
+            </c:choose>
           </li>
         </c:forEach>
       </ul>

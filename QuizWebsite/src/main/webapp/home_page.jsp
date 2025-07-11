@@ -44,7 +44,7 @@
                 <i class="bi bi-plus-circle"></i> Create Quiz</a></li>
             <li class="nav-item"><a class="nav-link" href="${ctx}/leaderboard">
                 <i class="bi bi-trophy-fill"></i> Leaderboard</a></li>
-            <li class="nav-item"><a class="nav-link" href="${ctx}/friends.jsp">
+            <li class="nav-item"><a class="nav-link" href="${ctx}/friends">
                 <i class="bi bi-people-fill"></i> Friends</a></li>
             <li class="nav-item"><a class="nav-link" href="${ctx}/messages">
                 <i class="bi bi-envelope-fill"></i> Messages
@@ -129,7 +129,7 @@
                 <c:choose>
                     <c:when test="${empty myFriends}">
                         <p>You have no friends yet.
-                            <a href="${ctx}/friends.jsp" class="link-light">Find some</a>.
+                            <a href="${ctx}/friends" class="link-light">Find some</a>.
                         </p>
                     </c:when>
                     <c:otherwise>
@@ -159,7 +159,7 @@
                         <ul class="mb-0">
                             <c:forEach var="row" items="${friendsActivity}">
                                 <li>
-                                    <strong>${row.sender.displayName}</strong> scored
+                                    <strong>${row.user.displayName}</strong> scored
                                     <span class="fw-semibold">${row.attempt.score}</span> on
                                     <a href="${ctx}/startQuiz?quizId=${row.quiz.quizId}" class="link-light">
                                             ${row.quiz.title}

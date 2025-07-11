@@ -71,14 +71,13 @@
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="<%= request.getContextPath() %>/leaderboard.jsp">
+        <a class="nav-link" href="<%= request.getContextPath() %>/leaderboard">
           <i class="bi bi-trophy-fill"></i> Leaderboard
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="<%= request.getContextPath() %>/friends.jsp">
-          <i class="bi bi-people-fill"></i> Friends
-        </a>
+        <a class="nav-link" href="<%= request.getContextPath() %>/friends">
+          <i class="bi bi-people-fill"></i> Friends</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="<%= request.getContextPath() %>/messages">
