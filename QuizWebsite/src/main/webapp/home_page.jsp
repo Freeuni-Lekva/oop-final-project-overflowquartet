@@ -90,16 +90,18 @@
             <span class="position-relative" data-bs-toggle="tooltip" data-bs-title="${ach.description}">
               <i class="bi ${ach.iconUrl} fs-2" style="color:#ffd700;"></i>
             </span>
-            </c:forEach>
-            <c:if test="${empty userAchievements}">
-                <div class="rounded-pill px-3 py-2 d-flex align-items-center justify-content-center" style="background:rgba(255,255,255,0.10); min-width:220px;">
-                    <i class="bi bi-patch-check-fill me-2 fs-4" style="color:#ffe066;"></i>
-                    <span class="small text-light">No achievements yet</span>
-                    <a href="${ctx}/achievements" class="btn btn-sm btn-light ms-3 px-3 py-1 fw-semibold text-primary d-flex align-items-center" style="font-size:1em; line-height:1.1; min-height:unset;">
-                        <i class="bi bi-arrow-right-circle me-2"></i>See all
-                    </a>
-                </div>
-            </c:if>
+
+          </c:forEach>
+          <c:if test="${empty userAchievements}">
+            <div class="rounded-pill px-3 py-2 d-flex align-items-center justify-content-center" style="background:rgba(255,255,255,0.10); min-width:220px;">
+              <i class="bi bi-patch-check-fill me-2 fs-4" style="color:#ffe066;"></i>
+              <span class="small text-light">No achievements yet</span>
+              <a href="${ctx}/achievements" class="btn btn-sm btn-light ms-3 px-3 py-1 fw-semibold text-primary d-flex align-items-center" style="font-size:1em; line-height:1.1; min-height:unset;">
+                <i class="bi bi-arrow-right-circle me-2"></i>See all
+              </a>
+            </div>
+          </c:if>
+
         </div>
         <script>
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
