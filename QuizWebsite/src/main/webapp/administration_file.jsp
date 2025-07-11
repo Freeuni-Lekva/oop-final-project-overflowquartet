@@ -198,6 +198,9 @@
         </div>
     </div>
 </div>
+<footer class="text-center py-3 text-white-50">
+    © 2025 Quizzmosis · Made with <i class="bi bi-heart-fill"></i> by OverflowQuartet
+</footer>
 
 <!-- ══ BOOTSTRAP & MODAL SCRIPT ═════════════════════════════════════ -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -219,5 +222,6 @@
         document.getElementById('quizDeleteInput').value    = btn.dataset.quizid;
     });
 </script>
+
 </body>
 </html>
