@@ -73,13 +73,15 @@ public class QuizDAO {
      * Retrieves a Quiz by its ID.
      */
     public Quiz getQuizById(int quizId) {
-        String sql = "SELECT * FROM quizzes WHERE quiz_id = ?";
+        String sql = "SELECT q.*, u.username AS owner_username FROM quizzes q LEFT JOIN users u ON q.owner_id = u.user_id WHERE q.quiz_id = ?";
         try (Connection conn = DBConnector.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, quizId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return extractQuiz(rs);
+                    Quiz quiz = extractQuiz(rs);
+                    quiz.setOwnerUsername(rs.getString("owner_username"));
+                    return quiz;
                 }
             }
         } catch (SQLException e) {
@@ -93,13 +95,15 @@ public class QuizDAO {
      */
     public List<Quiz> getQuizzesByOwner(int ownerId) {
         List<Quiz> list = new ArrayList<>();
-        String sql = "SELECT * FROM quizzes WHERE owner_id = ? ORDER BY creation_date DESC";
+        String sql = "SELECT q.*, u.username AS owner_username FROM quizzes q LEFT JOIN users u ON q.owner_id = u.user_id WHERE q.owner_id = ? ORDER BY q.creation_date DESC";
         try (Connection conn = DBConnector.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, ownerId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    list.add(extractQuiz(rs));
+                    Quiz quiz = extractQuiz(rs);
+                    quiz.setOwnerUsername(rs.getString("owner_username"));
+                    list.add(quiz);
                 }
             }
         } catch (SQLException e) {
@@ -174,15 +178,19 @@ public class QuizDAO {
      */
     public List<Quiz> getAllQuizzesWithQuestionCount() {
         List<Quiz> list = new ArrayList<>();
-        String sql = "SELECT q.*, COUNT(ques.question_id) AS question_count " +
-                     "FROM quizzes q LEFT JOIN questions ques ON q.quiz_id = ques.quiz_id " +
-                     "GROUP BY q.quiz_id ORDER BY q.creation_date DESC";
+        String sql = "SELECT q.*, u.username AS owner_username, COUNT(ques.question_id) AS question_count " +
+                     "FROM quizzes q " +
+                     "LEFT JOIN users u ON q.owner_id = u.user_id " +
+                     "LEFT JOIN questions ques ON q.quiz_id = ques.quiz_id " +
+                     "GROUP BY q.quiz_id, u.username " +
+                     "ORDER BY q.creation_date DESC";
         try (Connection conn = DBConnector.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Quiz quiz = extractQuiz(rs);
                     quiz.setQuestionCount(rs.getInt("question_count"));
+                    quiz.setOwnerUsername(rs.getString("owner_username"));
                     list.add(quiz);
                 }
             }
@@ -205,6 +213,7 @@ public class QuizDAO {
         quiz.setMultiplePages(rs.getBoolean("multiple_pages"));
         quiz.setImmediateCorrection(rs.getBoolean("immediate_correction"));
         quiz.setCreationDate(rs.getTimestamp("creation_date"));
+        try { quiz.setOwnerUsername(rs.getString("owner_username")); } catch (SQLException ignore) {}
         return quiz;
     }
 

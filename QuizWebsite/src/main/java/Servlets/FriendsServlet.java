@@ -31,12 +31,7 @@ public class FriendsServlet extends HttpServlet {
         int userId = currentUser.getUserId();
 
         // 1. All accepted friends (list of User)
-        List<Integer> friendIds = friendsDAO.getFriendIds(userId, FriendsDAO.FriendStatus.ACCEPTED);
-        List<User> friends = new ArrayList<>();
-        for (int fid : friendIds) {
-            User friend = userDAO.getUserById(fid);
-            if (friend != null) friends.add(friend);
-        }
+        List<User> friends = friendsDAO.getFriendsAsUsers(userId);
         request.setAttribute("friends", friends);
 
         // 2. Pending requests you received (list of User)
@@ -44,7 +39,14 @@ public class FriendsServlet extends HttpServlet {
         List<User> pendingReceived = new ArrayList<>();
         for (int fromId : pendingReqFrom) {
             User u = userDAO.getUserById(fromId);
-            if (u != null) pendingReceived.add(u);
+            if (u != null) {
+                pendingReceived.add(u);
+            } else {
+                User fallback = new User();
+                fallback.setUserId(fromId);
+                fallback.setUsername("User#" + fromId);
+                pendingReceived.add(fallback);
+            }
         }
         request.setAttribute("pendingReceived", pendingReceived);
 
@@ -53,7 +55,14 @@ public class FriendsServlet extends HttpServlet {
         List<User> pendingSent = new ArrayList<>();
         for (int sentId : pendingSentIds) {
             User u = userDAO.getUserById(sentId);
-            if (u != null) pendingSent.add(u);
+            if (u != null) {
+                pendingSent.add(u);
+            } else {
+                User fallback = new User();
+                fallback.setUserId(sentId);
+                fallback.setUsername("User#" + sentId);
+                pendingSent.add(fallback);
+            }
         }
         request.setAttribute("pendingSent", pendingSent);
 

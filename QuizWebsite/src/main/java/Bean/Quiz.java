@@ -12,6 +12,8 @@ public class Quiz {
     private boolean immediateCorrection;
     private Timestamp creationDate;
     private int questionCount;
+    private String ownerDisplayName;
+    private String ownerUsername;
 
     public int getQuizId() {
         return quizId;
@@ -67,4 +69,8 @@ public class Quiz {
     public void setQuestionCount(int questionCount) {
         this.questionCount = questionCount;
     }
+    public String getOwnerDisplayName() { return ownerDisplayName; }
+    public void setOwnerDisplayName(String ownerDisplayName) { this.ownerDisplayName = ownerDisplayName; }
+    public String getOwnerUsername() { return ownerUsername; }
+    public void setOwnerUsername(String ownerUsername) { this.ownerUsername = ownerUsername; }
 } 

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import Bean.User;
 
 /**
  * DAO for all operations on the <code>friends</code> table.
@@ -183,6 +184,30 @@ public class FriendsDAO {
             throw new FriendshipException("Unable to fetch pending requests", e);
         }
         return ids;
+    }
+
+    public List<User> getFriendsAsUsers(int userId) {
+        List<User> friends = new ArrayList<>();
+        String sql = "SELECT u.* FROM friends f JOIN users u ON f.friend_id = u.user_id WHERE f.user_id = ? AND f.status = 'accepted'";
+        try (Connection conn = DBConnector.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    User user = new User();
+                    user.setUserId(rs.getInt("user_id"));
+                    user.setUsername(rs.getString("username"));
+                    user.setPasswordHash(rs.getString("password_hash"));
+                    user.setDisplayName(rs.getString("display_name"));
+                    user.setCreatedAt(rs.getTimestamp("created_at"));
+                    user.setLastLogin(rs.getTimestamp("last_login"));
+                    friends.add(user);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return friends;
     }
 
     private void validateDifferentUsers(int userA, int userB) {

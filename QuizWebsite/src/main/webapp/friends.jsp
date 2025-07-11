@@ -1,4 +1,4 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html>
@@ -100,7 +100,9 @@
             <li class="list-group-item d-flex align-items-center justify-content-between bg-transparent text-light">
                             <span>
                                 <i class="bi bi-person-circle me-2"></i>
-                                <b>${friend.displayName}</b> <small class="text-secondary">(@${friend.username})</small>
+                                <a href="${pageContext.request.contextPath}/profile?id=${friend.userId}" class="link-light">
+                                    <b>${friend.username}</b>
+                                </a>
                             </span>
               <form method="post" action="${pageContext.request.contextPath}/friends" class="mb-0">
                 <input type="hidden" name="action" value="remove"/>
@@ -127,7 +129,9 @@
             <li class="list-group-item d-flex align-items-center justify-content-between bg-transparent text-light">
                             <span>
                                 <i class="bi bi-person-circle me-2"></i>
-                                <b>${req.displayName}</b> <small class="text-secondary">(@${req.username})</small>
+                                <a href="${pageContext.request.contextPath}/profile?id=${req.userId}" class="link-light">
+                                    <b>${req.username}</b>
+                                </a>
                             </span>
               <form method="post" action="${pageContext.request.contextPath}/friends" class="mb-0 d-flex gap-2">
                 <input type="hidden" name="targetId" value="${req.userId}"/>
@@ -158,7 +162,9 @@
             <li class="list-group-item d-flex align-items-center justify-content-between bg-transparent text-light">
                             <span>
                                 <i class="bi bi-person-circle me-2"></i>
-                                <b>${sent.displayName}</b> <small class="text-secondary">(@${sent.username})</small>
+                                <a href="${pageContext.request.contextPath}/profile?id=${sent.userId}" class="link-light">
+                                    <b>${sent.username}</b>
+                                </a>
                             </span>
               <form method="post" action="${pageContext.request.contextPath}/friends" class="mb-0">
                 <input type="hidden" name="action" value="remove"/>
@@ -189,7 +195,9 @@
           <li class="list-group-item d-flex align-items-center justify-content-between bg-transparent text-light">
                         <span>
                             <i class="bi bi-person-circle me-2"></i>
-                            <b>${user.displayName}</b> <small class="text-secondary">(@${user.username})</small>
+                            <a href="${pageContext.request.contextPath}/profile?id=${user.userId}" class="link-light">
+                                <b>${user.username}</b>
+                            </a>
                         </span>
             <form method="post" action="${pageContext.request.contextPath}/friends" class="mb-0">
               <input type="hidden" name="action" value="send"/>
