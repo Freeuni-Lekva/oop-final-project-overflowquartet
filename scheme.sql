@@ -141,6 +141,14 @@ CREATE TABLE IF NOT EXISTS user_achievements (
                                                  FOREIGN KEY (achievement_id) REFERENCES achievements(achievement_id) ON DELETE CASCADE
 );
 
+-- Insert the required achievements
+INSERT INTO achievements (name, description, icon_url) VALUES
+('Amateur Author', 'Created your first quiz', 'bi-pencil-square'),
+('Prolific Author', 'Created 5 quizzes', 'bi-journal-richtext'),
+('Prodigious Author', 'Created 10 quizzes', 'bi-award'),
+('Quiz Machine', 'Took 10 quizzes', 'bi-robot'),
+('I am the Greatest', 'Achieved the highest score on a quiz', 'bi-trophy-fill');
+
 
 -- Sample users for testing login
 INSERT INTO users (username, password_hash, display_name) VALUES

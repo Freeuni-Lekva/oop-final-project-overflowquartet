@@ -26,7 +26,7 @@ public class AchievementServlet extends HttpServlet {
         AchievementsDAO dao = new AchievementsDAO();
         List<Achievement> achievements = dao.getAchievementsByUserId(user.getUserId());
 
-        request.setAttribute("achievements", achievements);
+        request.setAttribute("userAchievements", achievements);
         request.getRequestDispatcher("/achievements.jsp").forward(request, response);
     }
 }

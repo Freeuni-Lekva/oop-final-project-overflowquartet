@@ -111,6 +111,11 @@ public class HomeServlet extends HttpServlet {
         }
         req.setAttribute("recentAttemptsWithQuiz", recentYour);
 
+        // 8) User achievements
+        DB.AchievementsDAO achievementsDAO = new DB.AchievementsDAO();
+        List<Bean.Achievement> userAchievements = achievementsDAO.getAchievementsByUserId(userId);
+        req.setAttribute("userAchievements", userAchievements);
+
         // Forward to JSP
         req.getRequestDispatcher("/home_page.jsp")
                 .forward(req, resp);

@@ -36,6 +36,11 @@ public class FinishQuizServlet extends HttpServlet {
         att.setDurationSeconds(duration);
         quizAttemptDao.updateQuizAttempt(att);
 
+        // Check for achievements
+        DB.AchievementsService achievementsService = new DB.AchievementsService();
+        achievementsService.checkQuizAttemptAchievements(att.getUserId());
+        achievementsService.checkHighScoreAchievement(att.getUserId(), att.getQuizId(), score);
+
         req.setAttribute("attempt", att);
         req.setAttribute("answers", answers);
         req.getRequestDispatcher("/results.jsp")

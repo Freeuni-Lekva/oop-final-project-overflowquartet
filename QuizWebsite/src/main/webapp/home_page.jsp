@@ -52,6 +52,8 @@
             </a></li>
             <li class="nav-item"><a class="nav-link" href="${ctx}/history">
                 <i class="bi bi-clock-history"></i> History</a></li>
+            <li class="nav-item"><a class="nav-link" href="${ctx}/achievements">
+                <i class="bi bi-award-fill"></i> Achievements</a></li>
         </ul>
         <a href="${ctx}/LogoutServlet" class="btn btn-outline-light btn-sm">
             <i class="bi bi-box-arrow-right"></i> Log&nbsp;out
@@ -67,7 +69,7 @@
         <div class="d-flex flex-wrap justify-content-center gap-3 my-3">
           <c:forEach var="ach" items="${userAchievements}">
             <span class="position-relative" data-bs-toggle="tooltip" data-bs-title="${ach.description}">
-              <i class="bi ${ach.icon} fs-2" style="color:#ffd700;"></i>
+              <i class="bi ${ach.iconUrl} fs-2" style="color:#ffd700;"></i>
             </span>
           </c:forEach>
           <c:if test="${empty userAchievements}">
