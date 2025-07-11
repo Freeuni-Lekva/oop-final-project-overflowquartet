@@ -62,7 +62,11 @@ public class HomeServlet extends HttpServlet {
         FriendsDAO      friendsDAO   = new FriendsDAO();
         UserDAO         userDAO      = new UserDAO();
 
-        // 1) Featured quizzes (global)
+        // 1) Popular quizzes (top 3 by attempts)
+        List<Quiz> popularQuizzes = quizDAO.getPopularQuizzes(3);
+        req.setAttribute("popularQuizzes", popularQuizzes);
+        
+        // 2) Featured quizzes (global)
         List<Quiz> featuredQuizzes = quizDAO.getAllQuizzesWithQuestionCount();
         req.setAttribute("featuredQuizzes", featuredQuizzes);
 

@@ -104,46 +104,60 @@
 <section class="container pb-5">
   <c:choose>
     <c:when test="${empty historyList}">
-      <div class="alert alert-light text-center">
-        You haven’t taken any quizzes yet.
-        <a href="${pageContext.request.contextPath}/quizzes">Start one now!</a>
+      <div class="glass-card p-5 text-center">
+        <i class="bi bi-clock-history fs-1 text-light mb-3"></i>
+        <h5 class="fw-semibold mb-2">No Quiz History Yet</h5>
+        <p class="text-light mb-3">You haven't taken any quizzes yet. Start your quiz journey today!</p>
+        <a href="${pageContext.request.contextPath}/quizzes" class="btn btn-light text-primary fw-semibold">
+          <i class="bi bi-play-fill me-1"></i>Browse Quizzes
+        </a>
       </div>
     </c:when>
     <c:otherwise>
-      <div class="table-responsive glass-card p-3">
-        <table class="table table-sm table-bordered table-glass align-middle mb-0">
-          <thead>
-          <tr>
-            <th>Quiz</th>
-            <th>Score</th>
-            <th>Duration</th>
-            <th>Date</th>
-          </tr>
-          </thead>
-          <tbody>
+      <div class="glass-card p-4">
+        <div class="row g-3">
           <c:forEach var="row" items="${historyList}">
             <c:if test="${not empty row.quiz and not empty row.attempt}">
-            <tr>
-              <td>
-                <a href="${pageContext.request.contextPath}/startQuiz?quizId=${row.quiz.quizId}"
-                   class="text-decoration-none">
-                    ${row.quiz.title}
-                </a>
-              </td>
-              <td>${row.attempt.score}</td>
-              <td>
-                  <c:set var="mins" value="${row.attempt.durationSeconds div 60}" />
-                <fmt:formatNumber value="${mins}" pattern="#.##"/> mins
-              </td>
-              <td>
-                <fmt:formatDate value="${row.attempt.attemptDate}"
-                                pattern="MMM dd, yyyy HH:mm"/>
-              </td>
-            </tr>
+            <div class="col-12">
+              <div class="d-flex align-items-center justify-content-between p-4 rounded" 
+                   style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);">
+                <div class="d-flex align-items-center">
+                  <div class="me-4">
+                    <i class="bi bi-lightbulb-fill fs-3" style="color: #ffd700;"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-1 fw-semibold">
+                      <a href="${pageContext.request.contextPath}/startQuiz?quizId=${row.quiz.quizId}" 
+                         class="link-light text-decoration-none">
+                        ${row.quiz.title}
+                      </a>
+                    </h6>
+                    <small class="text-light">
+                      <i class="bi bi-calendar3 me-1"></i>
+                      <fmt:formatDate value="${row.attempt.attemptDate}" pattern="MMM dd, yyyy 'at' HH:mm"/>
+                    </small>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                  <div class="text-center">
+                    <div class="badge bg-success fs-6 px-3 py-2">
+                      <i class="bi bi-trophy-fill me-1"></i>
+                      Score: ${row.attempt.score}
+                    </div>
+                  </div>
+                  <div class="text-center">
+                    <div class="badge bg-info fs-6 px-3 py-2">
+                      <i class="bi bi-clock-fill me-1"></i>
+                      <c:set var="mins" value="${row.attempt.durationSeconds div 60}" />
+                      <fmt:formatNumber value="${mins}" pattern="#.##"/> mins
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
             </c:if>
           </c:forEach>
-          </tbody>
-        </table>
+        </div>
       </div>
     </c:otherwise>
   </c:choose>
