@@ -21,11 +21,20 @@ public class HomeServlet extends HttpServlet {
 
     // reuse this for both your own attempts and friends' attempts
     public static class AttemptWithQuiz {
-        public final QuizAttempt attempt;
-        public final Quiz      quiz;
+        private final QuizAttempt attempt;
+        private final Quiz quiz;
+        
         public AttemptWithQuiz(QuizAttempt a, Quiz q) {
             this.attempt = a;
             this.quiz    = q;
+        }
+        
+        public QuizAttempt getAttempt() {
+            return attempt;
+        }
+        
+        public Quiz getQuiz() {
+            return quiz;
         }
     }
 

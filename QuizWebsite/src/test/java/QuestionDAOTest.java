@@ -211,7 +211,7 @@ public class QuestionDAOTest {
         ));
         dao.addQuestion(q2);
 
-        List<Question> all = dao.getQuestionsForQuiz(quizId);
+        List<Question> all = dao.getQuestionsForQuiz(quizId, false);
         assertNotNull(all);
         assertEquals(2, all.size());
         assertTrue(all.stream().anyMatch(q -> "What's 2 + 2?".equals(q.getQuestionText())));

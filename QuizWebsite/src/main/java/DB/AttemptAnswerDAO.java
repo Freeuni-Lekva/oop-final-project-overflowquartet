@@ -98,6 +98,28 @@ public class AttemptAnswerDAO {
     }
 
     /**
+     * Retrieves all answers for a given attempt with question text included.
+     */
+    public List<AttemptAnswer> getAnswersForAttemptWithQuestions(int attemptId) {
+        String sql = "SELECT aa.*, q.question_text FROM attempt_answers aa " +
+                     "JOIN questions q ON aa.question_id = q.question_id " +
+                     "WHERE aa.attempt_id = ?";
+        List<AttemptAnswer> list = new ArrayList<>();
+        try (Connection conn = DBConnector.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, attemptId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapRowToAttemptAnswerWithQuestion(rs));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    /**
      * Retrieves all answers for a given question across all attempts (e.g., for stats).
      */
     public List<AttemptAnswer> getAnswersForQuestion(int questionId) {
@@ -197,6 +219,26 @@ public class AttemptAnswerDAO {
         a.setAttemptId(rs.getInt("attempt_id"));
         a.setQuestionId(rs.getInt("question_id"));
         a.setUserAnswerText(rs.getString("user_answer_text"));
+        // Handle NULL for is_correct
+        boolean correct = rs.getBoolean("is_correct");
+        if (rs.wasNull()) {
+            a.setIsCorrect(null);
+        } else {
+            a.setIsCorrect(correct);
+        }
+        return a;
+    }
+
+    /**
+     * Helper to map a row to an AttemptAnswer bean with question text.
+     */
+    private AttemptAnswer mapRowToAttemptAnswerWithQuestion(ResultSet rs) throws SQLException {
+        AttemptAnswer a = new AttemptAnswer();
+        a.setAttemptAnswerId(rs.getInt("attempt_answer_id"));
+        a.setAttemptId(rs.getInt("attempt_id"));
+        a.setQuestionId(rs.getInt("question_id"));
+        a.setUserAnswerText(rs.getString("user_answer_text"));
+        a.setQuestionText(rs.getString("question_text"));
         // Handle NULL for is_correct
         boolean correct = rs.getBoolean("is_correct");
         if (rs.wasNull()) {

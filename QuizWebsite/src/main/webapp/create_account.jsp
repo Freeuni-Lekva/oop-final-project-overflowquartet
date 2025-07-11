@@ -1,9 +1,15 @@
+<%-- Redirect to home if already signed in --%>
+<% if (session.getAttribute("user") != null) {
+    response.sendRedirect(request.getContextPath() + "/home_page.jsp");
+    return;
+} %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Quiz Website · Create Account</title>
+  <title>Quizzmosis</title>
 
   <!-- Bootstrap 5 -->
   <link
@@ -29,6 +35,7 @@
       box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.25);
       max-width: 400px;
       width: 100%;
+      margin-top: 5rem; /* Prevent overlap with site title */
     }
 
     /* subtle tint for inputs */
@@ -178,6 +185,15 @@
       }, false);
     });
   })();
+</script>
+
+<script>
+// Force reload on back navigation to prevent showing cached content after logout or login
+window.addEventListener('pageshow', function(event) {
+    if (event.persisted) {
+        window.location.reload();
+    }
+});
 </script>
 </body>
 </html>

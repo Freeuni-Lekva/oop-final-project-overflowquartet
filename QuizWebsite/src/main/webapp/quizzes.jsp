@@ -1,4 +1,5 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false" %>
+
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -79,9 +80,25 @@
           </h5>
           <p class="small flex-grow-1">${quiz.description}</p>
           <div class="d-flex justify-content-between align-items-center mt-2">
-            <span class="small"><i class="bi bi-question-circle"></i> ${quiz.questionCount} Qs</span>
-            <a href="quiz.jsp?id=${quiz.quizId}" class="btn btn-sm btn-light text-primary fw-semibold">Play</a>
+  <span class="small">
+    <i class="bi bi-question-circle"></i> ${quiz.questionCount} Qs
+  </span>
+            <c:choose>
+              <c:when test="${quiz.questionCount == 0}">
+                <a href="${pageContext.request.contextPath}/add-questions?quizId=${quiz.quizId}"
+                   class="btn btn-sm btn-warning fw-semibold">
+                  <i class="bi bi-plus-circle me-1"></i> Add Questions
+                </a>
+              </c:when>
+              <c:otherwise>
+                <a href="${pageContext.request.contextPath}/startQuiz?quizId=${quiz.quizId}"
+                   class="btn btn-sm btn-light text-primary fw-semibold">
+                  <i class="bi bi-play-fill me-1"></i> Start Quiz
+                </a>
+              </c:otherwise>
+            </c:choose>
           </div>
+
         </div>
       </div>
     </c:forEach>

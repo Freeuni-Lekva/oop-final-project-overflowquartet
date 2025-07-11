@@ -81,8 +81,10 @@ public class QuestionDAO  {
     }
 
 
-    public List<Question> getQuestionsForQuiz(int quizId) throws SQLException {
-        String sql = "SELECT * FROM questions WHERE quiz_id = ? ORDER BY question_order;";
+    public List<Question> getQuestionsForQuiz(int quizId, boolean random) throws SQLException {
+        String sql = random ? 
+            "SELECT * FROM questions WHERE quiz_id = ? ORDER BY RAND()" :
+            "SELECT * FROM questions WHERE quiz_id = ? ORDER BY question_order";
         List<Question> questions = new ArrayList<>();
 
         try (Connection conn = DBConnector.getConnection();
