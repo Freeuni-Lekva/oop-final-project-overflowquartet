@@ -74,8 +74,111 @@
 </nav>
 <main class="container pb-5">
   <h1 class="fw-bold display-5 text-center my-4">All Quizzes</h1>
-  <div class="row g-4">
-    <c:forEach var="quiz" items="${allQuizzes}">
+  
+  <!-- POPULAR QUIZZES SECTION -->
+  <c:if test="${not empty popularQuizzes}">
+    <div class="mb-5">
+      <h2 class="h4 fw-semibold mb-3">
+        <i class="bi bi-fire"></i> Popular Quizzes
+      </h2>
+      <div class="row g-4">
+        <c:forEach var="quiz" items="${popularQuizzes}">
+          <div class="col-12 col-sm-6 col-lg-4">
+            <div class="glass-card p-4 h-100 d-flex flex-column position-relative">
+              <!-- Popular badge -->
+              <div class="position-absolute top-0 end-0 mt-2 me-2">
+                <span class="badge bg-warning text-dark">
+                  <i class="bi bi-fire"></i> Popular
+                </span>
+              </div>
+              <h5 class="fw-semibold mb-1">
+                <i class="bi bi-lightbulb-fill me-1"></i> 
+                <a href="<%= request.getContextPath() %>/quiz-summary?quizId=${quiz.quizId}" class="link-light text-decoration-none">
+                  ${quiz.title}
+                </a>
+              </h5>
+              <p class="small flex-grow-1">${quiz.description}</p>
+              <p class="small text-light mb-2">
+                <i class="bi bi-person-circle me-1"></i> by ${quiz.ownerUsername}
+              </p>
+              <div class="d-flex justify-content-between align-items-center mt-2">
+                <span class="small">
+                  <i class="bi bi-question-circle"></i> ${quiz.questionCount} Qs
+                  <span class="ms-2"><i class="bi bi-people"></i> ${quiz.attemptCount} attempts</span>
+                </span>
+                <c:choose>
+                  <c:when test="${quiz.questionCount == 0}">
+                    <a href="${pageContext.request.contextPath}/add-questions?quizId=${quiz.quizId}"
+                       class="btn btn-sm btn-warning fw-semibold">
+                      <i class="bi bi-plus-circle me-1"></i> Add Questions
+                    </a>
+                  </c:when>
+                  <c:otherwise>
+                    <a href="${pageContext.request.contextPath}/startQuiz?quizId=${quiz.quizId}"
+                       class="btn btn-sm btn-warning text-dark fw-semibold">
+                      <i class="bi bi-play-fill me-1"></i> Start Quiz
+                    </a>
+                  </c:otherwise>
+                </c:choose>
+              </div>
+            </div>
+          </div>
+        </c:forEach>
+      </div>
+    </div>
+  </c:if>
+  
+  <!-- MY QUIZZES SECTION -->
+  <c:if test="${not empty myQuizzes}">
+    <div class="mb-5">
+      <h2 class="h4 fw-semibold mb-3">
+        <i class="bi bi-person-circle"></i> My Quizzes
+      </h2>
+      <div class="row g-4">
+        <c:forEach var="quiz" items="${myQuizzes}">
+          <div class="col-12 col-sm-6 col-lg-4">
+            <div class="glass-card p-4 h-100 d-flex flex-column">
+              <h5 class="fw-semibold mb-1">
+                <i class="bi bi-lightbulb-fill me-1"></i> 
+                <a href="<%= request.getContextPath() %>/quiz-summary?quizId=${quiz.quizId}" class="link-light text-decoration-none">
+                  ${quiz.title}
+                </a>
+              </h5>
+              <p class="small flex-grow-1">${quiz.description}</p>
+              <p class="small text-light mb-2">
+                <i class="bi bi-person-circle me-1"></i> by ${quiz.ownerUsername}
+              </p>
+              <div class="d-flex justify-content-between align-items-center mt-2">
+                <span class="small">
+                  <i class="bi bi-question-circle"></i> ${quiz.questionCount} Qs
+                </span>
+                <c:choose>
+                  <c:when test="${quiz.questionCount == 0}">
+                    <a href="${pageContext.request.contextPath}/add-questions?quizId=${quiz.quizId}"
+                       class="btn btn-sm btn-warning fw-semibold">
+                      <i class="bi bi-plus-circle me-1"></i> Add Questions
+                    </a>
+                  </c:when>
+                  <c:otherwise>
+                    <a href="${pageContext.request.contextPath}/startQuiz?quizId=${quiz.quizId}"
+                       class="btn btn-sm btn-light text-primary fw-semibold">
+                      <i class="bi bi-play-fill me-1"></i> Start Quiz
+                    </a>
+                  </c:otherwise>
+                </c:choose>
+              </div>
+            </div>
+          </div>
+        </c:forEach>
+      </div>
+    </div>
+  </c:if>
+  
+  <!-- ALL QUIZZES SECTION -->
+  <div class="mb-5">
+    <h2 class="h4 fw-semibold mb-3">All Quizzes</h2>
+    <div class="row g-4">
+      <c:forEach var="quiz" items="${allQuizzes}">
       <div class="col-12 col-sm-6 col-lg-4">
         <div class="glass-card p-4 h-100 d-flex flex-column">
           <h5 class="fw-semibold mb-1">

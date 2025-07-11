@@ -91,6 +91,35 @@ public class QuizDAO {
     }
 
     /**
+     * Retrieves all quizzes owned by the given user with question counts.
+     */
+    public List<Quiz> getQuizzesByOwnerWithQuestionCount(int ownerId) {
+        List<Quiz> list = new ArrayList<>();
+        String sql = "SELECT q.*, u.username AS owner_username, COUNT(ques.question_id) AS question_count " +
+                     "FROM quizzes q " +
+                     "LEFT JOIN users u ON q.owner_id = u.user_id " +
+                     "LEFT JOIN questions ques ON q.quiz_id = ques.quiz_id " +
+                     "WHERE q.owner_id = ? " +
+                     "GROUP BY q.quiz_id, u.username " +
+                     "ORDER BY q.creation_date DESC";
+        try (Connection conn = DBConnector.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, ownerId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Quiz quiz = extractQuiz(rs);
+                    quiz.setQuestionCount(rs.getInt("question_count"));
+                    quiz.setOwnerUsername(rs.getString("owner_username"));
+                    list.add(quiz);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    /**
      * Retrieves all quizzes owned by the given user.
      */
     public List<Quiz> getQuizzesByOwner(int ownerId) {
@@ -226,6 +255,39 @@ public class QuizDAO {
                 while (rs.next()) {
                     Quiz quiz = extractQuiz(rs);
                     quiz.setOwnerUsername(rs.getString("owner_username"));
+                    list.add(quiz);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+    
+    /**
+     * Get the most popular quizzes (by number of attempts) with question count and attempt count.
+     */
+    public List<Quiz> getPopularQuizzes(int limit) {
+        List<Quiz> list = new ArrayList<>();
+        String sql = "SELECT q.*, u.username AS owner_username, " +
+                     "COUNT(DISTINCT ques.question_id) AS question_count, " +
+                     "COALESCE(attempt_counts.attempt_count, 0) AS attempt_count " +
+                     "FROM quizzes q " +
+                     "LEFT JOIN users u ON q.owner_id = u.user_id " +
+                     "LEFT JOIN questions ques ON q.quiz_id = ques.quiz_id " +
+                     "LEFT JOIN (SELECT quiz_id, COUNT(*) AS attempt_count FROM quiz_attempts GROUP BY quiz_id) attempt_counts ON q.quiz_id = attempt_counts.quiz_id " +
+                     "GROUP BY q.quiz_id, u.username, attempt_counts.attempt_count " +
+                     "ORDER BY attempt_count DESC, q.creation_date DESC " +
+                     "LIMIT ?";
+        try (Connection conn = DBConnector.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, limit);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Quiz quiz = extractQuiz(rs);
+                    quiz.setQuestionCount(rs.getInt("question_count"));
+                    quiz.setOwnerUsername(rs.getString("owner_username"));
+                    quiz.setAttemptCount(rs.getInt("attempt_count"));
                     list.add(quiz);
                 }
             }

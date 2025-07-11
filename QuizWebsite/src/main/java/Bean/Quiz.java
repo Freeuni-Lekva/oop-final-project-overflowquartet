@@ -14,6 +14,7 @@ public class Quiz {
     private int questionCount;
     private String ownerDisplayName;
     private String ownerUsername;
+    private int attemptCount;
 
     public int getQuizId() {
         return quizId;
@@ -73,4 +74,6 @@ public class Quiz {
     public void setOwnerDisplayName(String ownerDisplayName) { this.ownerDisplayName = ownerDisplayName; }
     public String getOwnerUsername() { return ownerUsername; }
     public void setOwnerUsername(String ownerUsername) { this.ownerUsername = ownerUsername; }
+    public int getAttemptCount() { return attemptCount; }
+    public void setAttemptCount(int attemptCount) { this.attemptCount = attemptCount; }
 } 
