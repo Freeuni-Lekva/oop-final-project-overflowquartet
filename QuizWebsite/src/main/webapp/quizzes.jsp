@@ -28,18 +28,45 @@
 <body>
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark glass-card mx-3 mt-3 px-3">
-  <a class="navbar-brand fw-semibold" href="${pageContext.request.contextPath}/">QuizSite</a>
+  <a class="navbar-brand fw-bold d-flex align-items-center"
+     href="<%= request.getContextPath() %>/HomeServlet">
+    Quizzmosis
+  </a>
   <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
     <span class="navbar-toggler-icon"></span>
   </button>
   <div class="collapse navbar-collapse" id="navMain">
-    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-      <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/home_page.jsp">Home</a></li>
-      <li class="nav-item"><a class="nav-link active fw-semibold" href="#">Quizzes</a></li>
-      <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/create_quiz.jsp">Create Quiz</a></li>
-      <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/leaderboard.jsp">Leaderboard</a></li>
+    <ul class="navbar-nav me-auto">
+      <li class="nav-item">
+        <a class="nav-link"
+           href="<%= request.getContextPath() %>/HomeServlet">
+          <i class="bi bi-house-door-fill"></i> Home
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link active fw-semibold" href="<%= request.getContextPath() %>/quizzes"><i class="bi bi-list-check"></i> Quizzes</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="<%= request.getContextPath() %>/create"><i class="bi bi-plus-circle"></i> Create Quiz</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#"><i class="bi bi-trophy-fill"></i> Leaderboard</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="<%= request.getContextPath() %>/friends.jsp"><i class="bi bi-people-fill"></i> Friends</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="${pageContext.request.contextPath}/messages">
+          <i class="bi bi-envelope-fill"></i> Messages
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="<%= request.getContextPath() %>/history"><i class="bi bi-clock-history"></i> History</a>
+      </li>
     </ul>
-    <a href="${pageContext.request.contextPath}/logout" class="btn btn-outline-light btn-sm">Log out</a>
+    <a href="<%= request.getContextPath() %>/LogoutServlet" class="btn btn-outline-light btn-sm">
+      <i class="bi bi-box-arrow-right"></i> Log&nbsp;out
+    </a>
   </div>
 </nav>
 <main class="container pb-5">
