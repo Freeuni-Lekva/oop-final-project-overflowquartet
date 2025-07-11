@@ -73,6 +73,9 @@
       <li class="nav-item">
         <a class="nav-link" href="<%= request.getContextPath() %>/history"><i class="bi bi-clock-history"></i> History</a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link" href="<%= request.getContextPath() %>/achievements"><i class="bi bi-award-fill"></i> Achievements</a>
+      </li>
     </ul>
     <a href="<%= request.getContextPath() %>/LogoutServlet" class="btn btn-outline-light btn-sm">
       <i class="bi bi-box-arrow-right"></i> Log&nbsp;out

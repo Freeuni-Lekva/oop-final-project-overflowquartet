@@ -48,6 +48,10 @@ public class QuizCreateServlet extends HttpServlet {
             req.setAttribute("error", "Failed to create quiz. Please try again.");
             req.getRequestDispatcher("/create.jsp").forward(req, resp);
         } else {
+            // Check for quiz creation achievements
+            DB.AchievementsService achievementsService = new DB.AchievementsService();
+            achievementsService.checkQuizCreationAchievements(user.getUserId());
+            
             // Redirect to add questions page
             resp.sendRedirect(req.getContextPath() + "/add-questions?quizId=" + quizId);
         }

@@ -151,7 +151,7 @@
     <c:forEach var="ach" items="${userAchievements}">
       <div class="achievement-card">
         <span class="position-relative" data-bs-toggle="tooltip" data-bs-title="${ach.description}">
-          <i class="achievement-icon bi ${ach.icon}"></i>
+          <i class="achievement-icon bi ${ach.iconUrl}"></i>
         </span>
         <div class="achievement-title">${ach.name}</div>
         <div class="achievement-desc">${ach.description}</div>
