@@ -15,7 +15,7 @@ public class QuizzesServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         QuizDAO quizDAO = new QuizDAO();
-        List<Quiz> allQuizzes = quizDAO.searchQuizzes("");
+        List<Quiz> allQuizzes = quizDAO.getAllQuizzesWithQuestionCount();
         request.setAttribute("allQuizzes", allQuizzes);
         request.getRequestDispatcher("quizzes.jsp").forward(request, response);
     }

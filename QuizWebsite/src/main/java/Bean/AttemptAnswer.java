@@ -9,6 +9,7 @@ public class AttemptAnswer {
     private int questionId;
     private String userAnswerText;
     private Boolean isCorrect; // nullable, because DB allows NULL
+    private String questionText; // for displaying in results
 
     public AttemptAnswer() {}
 
@@ -57,6 +58,14 @@ public class AttemptAnswer {
 
     public void setIsCorrect(Boolean isCorrect) {
         this.isCorrect = isCorrect;
+    }
+
+    public String getQuestionText() {
+        return questionText;
+    }
+
+    public void setQuestionText(String questionText) {
+        this.questionText = questionText;
     }
 
     @Override

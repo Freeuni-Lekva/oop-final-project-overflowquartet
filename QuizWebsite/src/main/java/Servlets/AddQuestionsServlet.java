@@ -9,8 +9,6 @@ import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.List;
 import Bean.User;
-import DB.QuizDAO;
-import Bean.Quiz;
 
 @WebServlet("/add-questions")
 public class AddQuestionsServlet extends HttpServlet {
@@ -32,7 +30,7 @@ public class AddQuestionsServlet extends HttpServlet {
         QuestionDAO questionDAO = new QuestionDAO();
         List<Question> questions;
         try {
-            questions = questionDAO.getQuestionsForQuiz(quizId);
+            questions = questionDAO.getQuestionsForQuiz(quizId, false);
         } catch (Exception e) {
             req.setAttribute("error", "Failed to load questions: " + e.getMessage());
             questions = java.util.Collections.emptyList();
@@ -104,7 +102,7 @@ public class AddQuestionsServlet extends HttpServlet {
             QuestionDAO questionDAO = new QuestionDAO();
             List<Question> questions;
             try {
-                questions = questionDAO.getQuestionsForQuiz(quizId);
+                questions = questionDAO.getQuestionsForQuiz(quizId, false);
             } catch (Exception e) {
                 questions = java.util.Collections.emptyList();
             }
@@ -122,7 +120,7 @@ public class AddQuestionsServlet extends HttpServlet {
             req.setAttribute("error", "Failed to add question: " + e.getMessage());
             List<Question> questions;
             try {
-                questions = questionDAO.getQuestionsForQuiz(quizId);
+                questions = questionDAO.getQuestionsForQuiz(quizId, false);
             } catch (Exception ex) {
                 questions = java.util.Collections.emptyList();
             }

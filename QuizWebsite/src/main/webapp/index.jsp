@@ -1,3 +1,8 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<% if (session.getAttribute("user") != null) {
+    response.sendRedirect(request.getContextPath() + "/HomeServlet");
+    return;
+} %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -162,6 +167,14 @@
             }, false);
         });
     })();
+</script>
+<script>
+// Force reload on back navigation to prevent showing cached content after logout or login
+window.addEventListener('pageshow', function(event) {
+    if (event.persisted) {
+        window.location.reload();
+    }
+});
 </script>
 </body>
 </html>
