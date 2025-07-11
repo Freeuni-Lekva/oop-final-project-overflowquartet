@@ -23,10 +23,12 @@ public class HomeServlet extends HttpServlet {
     public static class AttemptWithQuiz {
         private final QuizAttempt attempt;
         private final Quiz quiz;
+        private final User user;
         
-        public AttemptWithQuiz(QuizAttempt a, Quiz q) {
+        public AttemptWithQuiz(QuizAttempt a, Quiz q, User u) {
             this.attempt = a;
             this.quiz    = q;
+            this.user    = u;
         }
         
         public QuizAttempt getAttempt() {
@@ -35,6 +37,10 @@ public class HomeServlet extends HttpServlet {
         
         public Quiz getQuiz() {
             return quiz;
+        }
+        
+        public User getUser() {
+            return user;
         }
     }
 
@@ -90,7 +96,7 @@ public class HomeServlet extends HttpServlet {
             for (QuizAttempt a : attemptDAO.getAttemptsByUser(f.getUserId())) {
                 if (count++ >= 3) break;
                 Quiz q = quizDAO.getQuizById(a.getQuizId());
-                friendsActivity.add(new AttemptWithQuiz(a, q));
+                friendsActivity.add(new AttemptWithQuiz(a, q, f));
             }
         }
         req.setAttribute("friendsActivity", friendsActivity);
@@ -101,7 +107,7 @@ public class HomeServlet extends HttpServlet {
         for (int i = 0; i < Math.min(3, allYour.size()); i++) {
             QuizAttempt a = allYour.get(i);
             Quiz q = quizDAO.getQuizById(a.getQuizId());
-            recentYour.add(new AttemptWithQuiz(a, q));
+            recentYour.add(new AttemptWithQuiz(a, q, currentUser));
         }
         req.setAttribute("recentAttemptsWithQuiz", recentYour);
 
