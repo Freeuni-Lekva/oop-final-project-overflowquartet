@@ -124,6 +124,23 @@ CREATE TABLE answers (
                              ON DELETE CASCADE
                              ON UPDATE CASCADE
 );
+CREATE TABLE IF NOT EXISTS achievements (
+                                            achievement_id INT AUTO_INCREMENT PRIMARY KEY,
+                                            name VARCHAR(100) NOT NULL,
+                                            description TEXT,
+                                            icon_url TEXT
+);
+
+
+CREATE TABLE IF NOT EXISTS user_achievements (
+                                                 user_id INT NOT NULL,
+                                                 achievement_id INT NOT NULL,
+                                                 earned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                                 PRIMARY KEY (user_id, achievement_id),
+                                                 FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+                                                 FOREIGN KEY (achievement_id) REFERENCES achievements(achievement_id) ON DELETE CASCADE
+);
+
 
 -- Sample users for testing login
 INSERT INTO users (username, password_hash, display_name) VALUES
