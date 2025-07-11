@@ -134,6 +134,7 @@ public class SubmitAnswerServlet extends HttpServlet {
             // show feedback on same page
             req.setAttribute("feedbackCorrect", isCorrect);
             req.setAttribute("userAnswer", userText);
+            req.setAttribute("showNext", true); // <-- add this flag
             // reload the same question with page info
             try {
                 req.setAttribute("question",
@@ -150,6 +151,7 @@ public class SubmitAnswerServlet extends HttpServlet {
             }
             req.getRequestDispatcher("/question.jsp")
                     .forward(req, resp);
+            return; // prevent further processing
         } else {
             // go to next page or finish
             String pageStr = req.getParameter("page");
