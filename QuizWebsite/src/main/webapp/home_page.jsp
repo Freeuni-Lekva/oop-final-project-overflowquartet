@@ -1,3 +1,5 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -174,8 +176,8 @@
 </section>
 
 <!-- ─── FOOTER ──────────────────────────────────────────────────────── -->
-<footer class="text-center py-3">
-    © 2025 QuizMossis · Made with <i class="bi bi-heart-fill"></i> by OverflowQuartet
+<footer class="text-center py-3 text-white-50">
+    © 2025 Quizzmosis · Made with <i class="bi bi-heart-fill"></i> by OverflowQuartet
 </footer>
 
 <!-- Bootstrap JS -->

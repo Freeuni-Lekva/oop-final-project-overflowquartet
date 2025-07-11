@@ -1,3 +1,4 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -50,15 +51,13 @@
         <a class="nav-link" href="<%= request.getContextPath() %>/create"><i class="bi bi-plus-circle"></i> Create Quiz</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="#"><i class="bi bi-trophy-fill"></i> Leaderboard</a>
+        <a class="nav-link" href="<%= request.getContextPath() %>/leaderboard.jsp"><i class="bi bi-trophy-fill"></i> Leaderboard</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="<%= request.getContextPath() %>/friends.jsp"><i class="bi bi-people-fill"></i> Friends</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="${pageContext.request.contextPath}/messages">
-          <i class="bi bi-envelope-fill"></i> Messages
-        </a>
+        <a class="nav-link" href="<%= request.getContextPath() %>/messages"><i class="bi bi-envelope-fill"></i> Messages</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="<%= request.getContextPath() %>/history"><i class="bi bi-clock-history"></i> History</a>
@@ -97,7 +96,12 @@
       </div>
     </c:if>
   </div>
+
 </main>
+<footer class="text-center py-3 text-white-50">
+  © 2025 Quizzmosis · Made with <i class="bi bi-heart-fill"></i> by OverflowQuartet
+</footer>
+
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
