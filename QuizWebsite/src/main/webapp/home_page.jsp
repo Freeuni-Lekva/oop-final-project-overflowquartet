@@ -87,7 +87,7 @@
                             <c:forEach var="q" items="${myCreatedQuizzes}">
                                 <li class="mb-2">
                                     <i class="bi bi-lightbulb-fill me-1"></i>
-                                    <a href="${ctx}/quiz?id=${q.quizId}" class="link-light fw-semibold">
+                                    <a href="${ctx}/startQuiz?quizId=${q.quizId}" class="link-light fw-semibold">
                                             ${q.title}
                                     </a>
                                 </li>
@@ -137,7 +137,7 @@
                                 <li>
                                     <strong>${row.sender.displayName}</strong> scored
                                     <span class="fw-semibold">${row.attempt.score}</span> on
-                                    <a href="${ctx}/quiz?id=${row.quiz.quizId}" class="link-light">
+                                    <a href="${ctx}/startQuiz?quizId=${row.quiz.quizId}" class="link-light">
                                             ${row.quiz.title}
                                     </a>
                                     <small class="text-muted">
@@ -165,7 +165,7 @@
                         <p class="small flex-grow-1">${quiz.description}</p>
                         <div class="d-flex justify-content-between align-items-center mt-2">
                             <span class="small"><i class="bi bi-question-circle"></i> ${quiz.questionCount} Qs</span>
-                            <a href="${ctx}/quiz?id=${quiz.quizId}"
+                            <a href="${ctx}/startQuiz?quizId=${quiz.quizId}"
                                class="btn btn-sm btn-light text-primary fw-semibold">Play</a>
                         </div>
                     </div>

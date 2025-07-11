@@ -40,7 +40,8 @@
     }
     table.table-glass th,
     table.table-glass td {
-      color: #fff;
+      color: #222;
+      background: rgba(255,255,255,0.85);
     }
   </style>
 </head>
@@ -118,17 +119,17 @@
           </thead>
           <tbody>
           <c:forEach var="row" items="${historyList}">
+            <c:if test="${not empty row.quiz and not empty row.attempt}">
             <tr>
               <td>
-                <a href="${pageContext.request.contextPath}/quiz?id=${row.quiz.quizId}"
-                   class="text-decoration-none text-white">
+                <a href="${pageContext.request.contextPath}/startQuiz?quizId=${row.quiz.quizId}"
+                   class="text-decoration-none">
                     ${row.quiz.title}
                 </a>
               </td>
               <td>${row.attempt.score}</td>
               <td>
-                  <%-- perform the division in JSTL core so it’s evaluated --%>
-                <c:set var="mins" value="${row.attempt.durationSeconds div 60}" />
+                  <c:set var="mins" value="${row.attempt.durationSeconds div 60}" />
                 <fmt:formatNumber value="${mins}" pattern="#.##"/> mins
               </td>
               <td>
@@ -136,6 +137,7 @@
                                 pattern="MMM dd, yyyy HH:mm"/>
               </td>
             </tr>
+            </c:if>
           </c:forEach>
           </tbody>
         </table>

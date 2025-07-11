@@ -94,6 +94,37 @@ public class SubmitAnswerServlet extends HttpServlet {
             return;
         }
 
+        // Check if this answer was already submitted (to prevent duplicates in immediate mode)
+        List<AttemptAnswer> existingAnswers = attemptAnswerDao.getAnswersForAttempt(attemptId);
+        boolean alreadyAnswered = existingAnswers.stream()
+                .anyMatch(a -> a.getQuestionId() == questionId);
+        
+        if (alreadyAnswered) {
+            System.out.println("DEBUG: Answer already submitted for question " + questionId + ", checking if it's the last question");
+            // If already answered, check if this is the last question and finish
+            String pageStr = req.getParameter("page");
+            String totalStr = req.getParameter("total");
+            
+            if (pageStr != null && totalStr != null) {
+                try {
+                    int page = Integer.parseInt(pageStr);
+                    int total = Integer.parseInt(totalStr);
+                    
+                    if (page >= total) {
+                        // This is the last question, finish the quiz
+                        resp.sendRedirect(req.getContextPath() + "/finishQuiz");
+                        return;
+                    } else {
+                        // Not the last question, go to next
+                        resp.sendRedirect(req.getContextPath() + "/showQuestion?page=" + (page + 1));
+                        return;
+                    }
+                } catch (NumberFormatException e) {
+                    System.err.println("ERROR: Invalid page or total format");
+                }
+            }
+        }
+        
         // Persist it
         AttemptAnswer aa = new AttemptAnswer(attemptId, questionId, userText, isCorrect);
         boolean saved = attemptAnswerDao.addAttemptAnswer(aa);
@@ -103,10 +134,17 @@ public class SubmitAnswerServlet extends HttpServlet {
             // show feedback on same page
             req.setAttribute("feedbackCorrect", isCorrect);
             req.setAttribute("userAnswer", userText);
-            // reload the same question
+            // reload the same question with page info
             try {
                 req.setAttribute("question",
                         new QuestionDAO().getQuestion(questionId));
+                // Set page and total attributes for the JSP
+                String currentPageStr = req.getParameter("page");
+                String currentTotalStr = req.getParameter("total");
+                if (currentPageStr != null && currentTotalStr != null) {
+                    req.setAttribute("page", Integer.parseInt(currentPageStr));
+                    req.setAttribute("total", Integer.parseInt(currentTotalStr));
+                }
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }

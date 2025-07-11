@@ -49,6 +49,7 @@ package Servlets;
 import Bean.Quiz;
 import Bean.QuizAttempt;
 import Bean.User;
+import Bean.AttemptWithQuiz;
 import DB.QuizAttemptDAO;
 import DB.QuizDAO;
 import jakarta.servlet.http.HttpServlet;
@@ -85,17 +86,16 @@ public class HistoryServlet extends HttpServlet {
         // 2) fetch all attempts
         QuizAttemptDAO attemptDao = new QuizAttemptDAO();
         List<QuizAttempt> attempts = attemptDao.getAttemptsByUser(user.getUserId());
+        System.out.println("DEBUG: Found " + attempts.size() + " attempts for user " + user.getUserId());
 
         // 3) for each attempt, look up the Quiz bean
         QuizDAO quizDao = new QuizDAO();
-        List<Map<String,Object>> historyList = new ArrayList<>();
+        List<AttemptWithQuiz> historyList = new ArrayList<>();
         for (QuizAttempt at : attempts) {
-            Map<String,Object> row = new HashMap<>();
-            row.put("attempt", at);
             Quiz q = quizDao.getQuizById(at.getQuizId());
-            row.put("quiz", q);
-            historyList.add(row);
+            historyList.add(new AttemptWithQuiz(at, q));
         }
+        System.out.println("DEBUG: historyList content: " + historyList);
 
         // 4) forward into JSP
         request.setAttribute("historyList", historyList);
