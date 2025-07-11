@@ -112,7 +112,7 @@
                             <c:forEach var="q" items="${myCreatedQuizzes}">
                                 <li class="mb-2">
                                     <i class="bi bi-lightbulb-fill me-1"></i>
-                                    <a href="${ctx}/startQuiz?quizId=${q.quizId}" class="link-light fw-semibold">
+                                    <a href="${ctx}/quiz-summary?quizId=${q.quizId}" class="link-light fw-semibold">
                                             ${q.title}
                                     </a>
                                     <span class="small ms-2">by <a href="${ctx}/profile?id=${q.ownerId}" class="link-light">${q.ownerUsername}</a></span>
