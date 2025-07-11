@@ -2,7 +2,8 @@ package Servlets;
 
 import Bean.User;
 import DB.FriendsDAO;
-import DB.UserDAO; // Assume you have one for looking up User by id/username
+import DB.MessageDAO;
+import DB.UserDAO;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -15,32 +16,36 @@ import java.util.List;
 @WebServlet("/friends")
 public class FriendsServlet extends HttpServlet {
 
-    private FriendsDAO friendsDAO = new FriendsDAO();
-    private UserDAO userDAO = new UserDAO(); // You'll need to implement this if not present
+    private final FriendsDAO friendsDAO = new FriendsDAO();
+    private final UserDAO userDAO = new UserDAO();
 
-    // Helper class to hold user info with friendship status
     public static class UserWithFriendshipStatus {
-        private User user;
-        private String friendshipStatus; // "friend", "pending_sent", "pending_received", "none"
-        
+        private final User user;
+        private final String friendshipStatus;
+
         public UserWithFriendshipStatus(User user, String status) {
             this.user = user;
             this.friendshipStatus = status;
         }
-        
+
         public User getUser() { return user; }
-        public String getFriendshipStatus() { return friendshipStatus; }
+
         public boolean isFriend() { return "friend".equals(friendshipStatus); }
         public boolean isPendingSent() { return "pending_sent".equals(friendshipStatus); }
         public boolean isPendingReceived() { return "pending_received".equals(friendshipStatus); }
         public boolean isNone() { return "none".equals(friendshipStatus); }
+
+        public String getFriendshipStatus() {
+            return friendshipStatus;
+        }
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        User currentUser = (User) session.getAttribute("user");
+
+        HttpSession session = request.getSession(false);
+        User currentUser = (User) (session != null ? session.getAttribute("user") : null);
         if (currentUser == null) {
             response.sendRedirect("login");
             return;
@@ -48,65 +53,49 @@ public class FriendsServlet extends HttpServlet {
 
         int userId = currentUser.getUserId();
 
-        // 1. All accepted friends (list of User)
+        // 1. Accepted Friends
         List<User> friends = friendsDAO.getFriendsAsUsers(userId);
         request.setAttribute("friends", friends);
 
-        // 2. Pending requests you received (list of User)
-        List<Integer> pendingReqFrom = friendsDAO.getPendingRequestsForUser(userId);
+        // 2. Pending friend requests received
+        List<Integer> pendingReceivedIds = friendsDAO.getPendingRequestsForUser(userId);
         List<User> pendingReceived = new ArrayList<>();
-        for (int fromId : pendingReqFrom) {
+        for (int fromId : pendingReceivedIds) {
             User u = userDAO.getUserById(fromId);
-            if (u != null) {
-                pendingReceived.add(u);
-            } else {
-                User fallback = new User();
-                fallback.setUserId(fromId);
-                fallback.setUsername("User#" + fromId);
-                pendingReceived.add(fallback);
-            }
+            pendingReceived.add(u != null ? u : fallbackUser(fromId));
         }
         request.setAttribute("pendingReceived", pendingReceived);
 
-        // 3. Pending requests you sent (list of User)
+        // 3. Pending friend requests sent
         List<Integer> pendingSentIds = friendsDAO.getFriendIds(userId, FriendsDAO.FriendStatus.PENDING);
         List<User> pendingSent = new ArrayList<>();
         for (int sentId : pendingSentIds) {
             User u = userDAO.getUserById(sentId);
-            if (u != null) {
-                pendingSent.add(u);
-            } else {
-                User fallback = new User();
-                fallback.setUserId(sentId);
-                fallback.setUsername("User#" + sentId);
-                pendingSent.add(fallback);
-            }
+            pendingSent.add(u != null ? u : fallbackUser(sentId));
         }
         request.setAttribute("pendingSent", pendingSent);
 
-        // 4. Search for users with friendship status
+        // 4. Search functionality
         String search = request.getParameter("search");
         if (search != null && !search.trim().isEmpty()) {
             List<User> searchResults = userDAO.searchUsersByUsernameOrDisplayName(search.trim(), userId);
             List<UserWithFriendshipStatus> searchResultsWithStatus = new ArrayList<>();
-            
-            // Get all friend IDs for quick lookup
+
             List<Integer> friendIds = friendsDAO.getFriendIds(userId, FriendsDAO.FriendStatus.ACCEPTED);
-            List<Integer> pendingSentIdsList = friendsDAO.getFriendIds(userId, FriendsDAO.FriendStatus.PENDING);
-            List<Integer> pendingReceivedIdsList = friendsDAO.getPendingRequestsForUser(userId);
-            
+            List<Integer> sentIds = friendsDAO.getFriendIds(userId, FriendsDAO.FriendStatus.PENDING);
+            List<Integer> receivedIds = friendsDAO.getPendingRequestsForUser(userId);
+
             for (User user : searchResults) {
                 String status = "none";
                 if (friendIds.contains(user.getUserId())) {
                     status = "friend";
-                } else if (pendingSentIdsList.contains(user.getUserId())) {
+                } else if (sentIds.contains(user.getUserId())) {
                     status = "pending_sent";
-                } else if (pendingReceivedIdsList.contains(user.getUserId())) {
+                } else if (receivedIds.contains(user.getUserId())) {
                     status = "pending_received";
                 }
                 searchResultsWithStatus.add(new UserWithFriendshipStatus(user, status));
             }
-            
             request.setAttribute("searchResults", searchResultsWithStatus);
         }
 
@@ -116,8 +105,9 @@ public class FriendsServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        User currentUser = (User) session.getAttribute("user");
+
+        HttpSession session = request.getSession(false);
+        User currentUser = (User) (session != null ? session.getAttribute("user") : null);
         if (currentUser == null) {
             response.sendRedirect("login");
             return;
@@ -125,7 +115,8 @@ public class FriendsServlet extends HttpServlet {
 
         int userId = currentUser.getUserId();
         String action = request.getParameter("action");
-        int targetId = 0;
+        int targetId;
+
         try {
             targetId = Integer.parseInt(request.getParameter("targetId"));
         } catch (Exception e) {
@@ -133,16 +124,26 @@ public class FriendsServlet extends HttpServlet {
             return;
         }
 
-        if ("send".equals(action)) {
-            friendsDAO.sendFriendRequest(userId, targetId);
-        } else if ("accept".equals(action)) {
-            friendsDAO.acceptFriendRequest(userId, targetId);
-        } else if ("reject".equals(action)) {
-            friendsDAO.rejectFriendRequest(userId, targetId);
-        } else if ("remove".equals(action)) {
-            friendsDAO.removeFriend(userId, targetId);
+        switch (action) {
+            case "send" -> {
+                friendsDAO.sendFriendRequest(userId, targetId);
+
+                // ✅ Send internal message as well
+                MessageDAO msgDAO = new MessageDAO();
+                msgDAO.sendFriendRequestMessage(userId, targetId);
+            }
+            case "accept" -> friendsDAO.acceptFriendRequest(userId, targetId);
+            case "reject" -> friendsDAO.rejectFriendRequest(userId, targetId);
+            case "remove" -> friendsDAO.removeFriend(userId, targetId);
         }
 
         response.sendRedirect("friends");
+    }
+
+    private User fallbackUser(int id) {
+        User u = new User();
+        u.setUserId(id);
+        u.setUsername("User#" + id);
+        return u;
     }
 }

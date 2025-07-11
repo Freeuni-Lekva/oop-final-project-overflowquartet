@@ -1,5 +1,4 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false" %>
-
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -63,15 +62,13 @@
       <li class="nav-item">
         <a class="nav-link" href="<%= request.getContextPath() %>/history"><i class="bi bi-clock-history"></i> History</a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" href="<%= request.getContextPath() %>/achievements"><i class="bi bi-award-fill"></i> Achievements</a>
-      </li>
     </ul>
     <a href="<%= request.getContextPath() %>/LogoutServlet" class="btn btn-outline-light btn-sm">
       <i class="bi bi-box-arrow-right"></i> Log&nbsp;out
     </a>
   </div>
 </nav>
+
 <main class="container pb-5">
   <h1 class="fw-bold display-5 text-center my-4">All Quizzes</h1>
   
@@ -182,35 +179,34 @@
       <div class="col-12 col-sm-6 col-lg-4">
         <div class="glass-card p-4 h-100 d-flex flex-column">
           <h5 class="fw-semibold mb-1">
-            <i class="bi bi-lightbulb-fill me-1"></i> 
-            <a href="<%= request.getContextPath() %>/quiz-summary?quizId=${quiz.quizId}" class="link-light text-decoration-none">
-              ${quiz.title}
-            </a>
+            <i class="bi bi-lightbulb-fill me-1"></i> ${quiz.title}
           </h5>
           <p class="small flex-grow-1">${quiz.description}</p>
-          <p class="small text-light mb-2">
-            <i class="bi bi-person-circle me-1"></i> by ${quiz.ownerUsername}
-          </p>
-          <div class="d-flex justify-content-between align-items-center mt-2">
-  <span class="small">
-    <i class="bi bi-question-circle"></i> ${quiz.questionCount} Qs
-  </span>
-            <c:choose>
-              <c:when test="${quiz.questionCount == 0}">
-                <a href="${pageContext.request.contextPath}/add-questions?quizId=${quiz.quizId}"
-                   class="btn btn-sm btn-warning fw-semibold">
-                  <i class="bi bi-plus-circle me-1"></i> Add Questions
-                </a>
-              </c:when>
-              <c:otherwise>
-                <a href="${pageContext.request.contextPath}/startQuiz?quizId=${quiz.quizId}"
-                   class="btn btn-sm btn-light text-primary fw-semibold">
-                  <i class="bi bi-play-fill me-1"></i> Start Quiz
-                </a>
-              </c:otherwise>
-            </c:choose>
+          <div class="d-flex justify-content-between align-items-center mt-2 flex-wrap gap-2">
+            <span class="small">
+              <i class="bi bi-question-circle"></i> ${quiz.questionCount} Qs
+            </span>
+            <div class="d-flex gap-2">
+              <c:choose>
+                <c:when test="${quiz.questionCount == 0}">
+                  <a href="${pageContext.request.contextPath}/add-questions?quizId=${quiz.quizId}"
+                     class="btn btn-sm btn-warning fw-semibold">
+                    <i class="bi bi-plus-circle me-1"></i> Add Questions
+                  </a>
+                </c:when>
+                <c:otherwise>
+                  <a href="${pageContext.request.contextPath}/startQuiz?quizId=${quiz.quizId}"
+                     class="btn btn-sm btn-light text-primary fw-semibold">
+                    <i class="bi bi-play-fill me-1"></i> Start Quiz
+                  </a>
+                </c:otherwise>
+              </c:choose>
+              <a href="${pageContext.request.contextPath}/challenge?quizId=${quiz.quizId}"
+                 class="btn btn-sm btn-outline-light fw-semibold">
+                <i class="bi bi-person-plus-fill me-1"></i> Challenge
+              </a>
+            </div>
           </div>
-
         </div>
       </div>
     </c:forEach>
@@ -225,8 +221,8 @@
       </div>
     </c:if>
   </div>
-
 </main>
+
 <footer class="text-center py-3 text-white-50">
   © 2025 Quizzmosis · Made with <i class="bi bi-heart-fill"></i> by OverflowQuartet
 </footer>
@@ -235,12 +231,12 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-// Force reload on back navigation to prevent showing cached content after logout
-window.addEventListener('pageshow', function(event) {
+  // Force reload on back navigation to prevent showing cached content after logout
+  window.addEventListener('pageshow', function(event) {
     if (event.persisted) {
-        window.location.reload();
+      window.location.reload();
     }
-});
+  });
 </script>
 </body>
 </html>

@@ -1,10 +1,10 @@
-
-
 package DB;
 
 import Bean.Message;
+
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -50,8 +50,8 @@ public class MessageDAO {
             return null;
         }
 
-        String sql = "INSERT INTO messages (sender_id, receiver_id, message_type, content) "
-                + "VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO messages (sender_id, receiver_id, message_type, content, sent_at) "
+                + "VALUES (?, ?, ?, ?, NOW())";
         try (Connection conn = DBConnector.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, senderId);
@@ -91,7 +91,21 @@ public class MessageDAO {
         }
         return null;
     }
-
+    public int countUnread(int receiverId) {
+        String sql = "SELECT COUNT(*) FROM messages WHERE receiver_id = ? AND is_read = FALSE";
+        try (Connection conn = DBConnector.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, receiverId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
     /**
      * Retrieves all messages received by a specific user, newest first.
      */
@@ -180,6 +194,50 @@ public class MessageDAO {
     }
 
     /**
+     * Sends a friend request message from one user to another.
+     */
+    public boolean sendFriendRequestMessage(int fromId, int toId) {
+        return createMessage(fromId, toId, "friend_request", "") != null;
+    }
+
+    /**
+     * Sends a note message from one user to another.
+     */
+    public boolean sendNote(int fromId, int toId, String content) {
+        return createMessage(fromId, toId, "note", content) != null;
+    }
+
+    /**
+     * Sends a challenge message from one user to another for a specific quiz.
+     * The content should be the quizId as a string.
+     */
+    public boolean sendChallenge(int fromId, int toId, int quizId) {
+        return createMessage(fromId, toId, "challenge", String.valueOf(quizId)) != null;
+    }
+
+
+    /**
+     * Sends a challenge message with both quiz ID and custom message content.
+     */
+    public static boolean sendChallengeMessage(int fromUserId, int toUserId, int quizId, String content) {
+        String sql = "INSERT INTO messages (sender_id, receiver_id, message_type, content, quiz_id, sent_at) " +
+                "VALUES (?, ?, 'challenge', ?, ?, NOW())";
+        try (Connection conn = DBConnector.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, fromUserId);
+            ps.setInt(2, toUserId);
+            ps.setString(3, content);
+            ps.setInt(4, quizId);
+            ps.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
+    /**
      * Helper to map a ResultSet row to a Message object.
      */
     private Message extractMessage(ResultSet rs) throws SQLException {
@@ -190,7 +248,8 @@ public class MessageDAO {
         msg.setMessageType(rs.getString("message_type"));
         msg.setContent(rs.getString("content"));
         msg.setRead(rs.getBoolean("is_read"));
-        msg.setSentAt(rs.getTimestamp("sent_at"));
+        Timestamp sentAt = rs.getTimestamp("sent_at");
+        msg.setSentAt(sentAt != null ? sentAt : new Timestamp(System.currentTimeMillis()));
         return msg;
     }
 }

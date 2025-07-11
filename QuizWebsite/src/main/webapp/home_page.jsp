@@ -86,12 +86,12 @@
         <h1 class="display-5 fw-bold">Welcome back, ${userDisplayName}!</h1>
         <!-- Achievements Summary -->
         <div class="d-flex flex-wrap justify-content-center gap-3 my-3">
-          <c:forEach var="ach" items="${userAchievements}">
+            <c:forEach var="ach" items="${userAchievements}">
             <span class="position-relative" data-bs-toggle="tooltip" data-bs-title="${ach.description}">
               <i class="bi ${ach.iconUrl} fs-2" style="color:#ffd700;"></i>
             </span>
-          </c:forEach>
 
+          </c:forEach>
           <c:if test="${empty userAchievements}">
             <div class="rounded-pill px-3 py-2 d-flex align-items-center justify-content-center" style="background:rgba(255,255,255,0.10); min-width:220px;">
               <i class="bi bi-patch-check-fill me-2 fs-4" style="color:#ffe066;"></i>
@@ -101,12 +101,13 @@
               </a>
             </div>
           </c:if>
+
         </div>
         <script>
-          var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-          tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl);
-          });
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
         </script>
         <p class="lead mb-4">What would you like to do today?</p>
         <a href="${ctx}/quizzes" class="btn btn-light btn-lg text-primary fw-semibold">Browse Quizzes</a>
@@ -128,6 +129,7 @@
                         </p>
                     </c:when>
                     <c:otherwise>
+
                         <div class="scrollable-content">
                             <ul class="list-unstyled mb-0">
                                 <c:forEach var="q" items="${myCreatedQuizzes}">
@@ -141,6 +143,7 @@
                                 </c:forEach>
                             </ul>
                         </div>
+
                     </c:otherwise>
                 </c:choose>
             </div>
@@ -337,13 +340,12 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-// Force reload on back navigation to prevent showing cached content after logout
-window.addEventListener('pageshow', function(event) {
-    if (event.persisted) {
-        window.location.reload();
-    }
-});
+    // Force reload on back navigation to prevent showing cached content after logout
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted) {
+            window.location.reload();
+        }
+    });
 </script>
 </body>
 </html>
-
