@@ -24,7 +24,9 @@ public class AddQuestionsServlet extends HttpServlet {
         DB.QuizDAO quizDAO = new DB.QuizDAO();
         Bean.Quiz quiz = quizDAO.getQuizById(quizId);
         if (quiz == null || user == null || quiz.getOwnerId() != user.getUserId()) {
-            resp.sendError(HttpServletResponse.SC_FORBIDDEN, "You are not allowed to edit this quiz.");
+            req.setAttribute("error", "You can only add questions to quizzes that you created.");
+            req.setAttribute("quizTitle", quiz != null ? quiz.getTitle() : "Unknown Quiz");
+            req.getRequestDispatcher("/access_denied.jsp").forward(req, resp);
             return;
         }
         QuestionDAO questionDAO = new QuestionDAO();
@@ -47,7 +49,9 @@ public class AddQuestionsServlet extends HttpServlet {
         DB.QuizDAO quizDAO = new DB.QuizDAO();
         Bean.Quiz quiz = quizDAO.getQuizById(quizId);
         if (quiz == null || user == null || quiz.getOwnerId() != user.getUserId()) {
-            resp.sendError(HttpServletResponse.SC_FORBIDDEN, "You are not allowed to edit this quiz.");
+            req.setAttribute("error", "You can only add questions to quizzes that you created.");
+            req.setAttribute("quizTitle", quiz != null ? quiz.getTitle() : "Unknown Quiz");
+            req.getRequestDispatcher("/access_denied.jsp").forward(req, resp);
             return;
         }
         String questionText = req.getParameter("questionText");

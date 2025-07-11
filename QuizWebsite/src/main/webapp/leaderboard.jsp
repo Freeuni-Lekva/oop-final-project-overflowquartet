@@ -52,6 +52,15 @@
         .my-row td { 
             font-weight: 600; 
         }
+        
+        /* Rank badge styling */
+        .rank-badge {
+            min-width: 35px;
+            text-align: center;
+        }
+        .rank-1 { background: linear-gradient(45deg, #ffd700, #ffed4e) !important; color: #000 !important; }
+        .rank-2 { background: linear-gradient(45deg, #c0c0c0, #e5e5e5) !important; color: #000 !important; }
+        .rank-3 { background: linear-gradient(45deg, #cd7f32, #daa520) !important; color: #fff !important; }
 
         /* footer styling */
         footer {
@@ -120,21 +129,34 @@
         <!-- Simple filter form -->
         <form class="row g-3 mb-4" method="get" action="<%= request.getContextPath() %>/leaderboard">
             <div class="col-12 col-md-6">
-                <select class="form-select" name="quizId" onchange="this.form.submit()">
+                <label for="quizSelect" class="form-label text-light">Filter by Quiz</label>
+                <select class="form-select" id="quizSelect" name="quizId" onchange="this.form.submit()">
                     <option value="">All Quizzes</option>
-                    <c:forEach var="quiz" items="${allQuizzes}">
-                        <option value="${quiz.quizId}" ${param.quizId == quiz.quizId ? 'selected' : ''}>
-                            ${quiz.title}
-                        </option>
-                    </c:forEach>
+                    <%
+                        java.util.List<Bean.Quiz> allQuizzes = (java.util.List<Bean.Quiz>) request.getAttribute("allQuizzes");
+                        String selectedQuizId = request.getParameter("quizId");
+                        if (allQuizzes != null) {
+                            for (Bean.Quiz quiz : allQuizzes) {
+                                String selected = (selectedQuizId != null && selectedQuizId.equals(String.valueOf(quiz.getQuizId()))) ? "selected" : "";
+                    %>
+                        <option value="<%= quiz.getQuizId() %>" <%= selected %>><%= quiz.getTitle() %></option>
+                    <%
+                            }
+                        }
+                    %>
                 </select>
             </div>
             <div class="col-12 col-md-6">
-                <select class="form-select" name="timeframe" onchange="this.form.submit()">
-                    <option value="all" ${param.timeframe=='all' ? 'selected' : ''}>All-time</option>
-                    <option value="today" ${param.timeframe=='today' ? 'selected' : ''}>Today</option>
-                    <option value="week" ${param.timeframe=='week' ? 'selected' : ''}>This week</option>
-                    <option value="month" ${param.timeframe=='month' ? 'selected' : ''}>This month</option>
+                <label for="timeframeSelect" class="form-label text-light">Time Period</label>
+                <select class="form-select" id="timeframeSelect" name="timeframe" onchange="this.form.submit()">
+                    <%
+                        String selectedTimeframe = request.getParameter("timeframe");
+                        if (selectedTimeframe == null) selectedTimeframe = "all";
+                    %>
+                    <option value="all" <%= "all".equals(selectedTimeframe) ? "selected" : "" %>>All-time</option>
+                    <option value="today" <%= "today".equals(selectedTimeframe) ? "selected" : "" %>>Today</option>
+                    <option value="week" <%= "week".equals(selectedTimeframe) ? "selected" : "" %>>This week</option>
+                    <option value="month" <%= "month".equals(selectedTimeframe) ? "selected" : "" %>>This month</option>
                 </select>
             </div>
         </form>
@@ -153,24 +175,37 @@
                 </tr>
                 </thead>
                 <tbody>
-                <c:choose>
-                    <c:when test="${not empty leaderboard}">
-                        <c:forEach var="row" items="${leaderboard}" varStatus="loop">
-                            <tr class="${row.userId == sessionScope.user.userId ? 'my-row' : ''}">
+                <%
+                    java.util.List<Servlets.LeaderboardServlet.LeaderboardEntry> leaderboard = 
+                        (java.util.List<Servlets.LeaderboardServlet.LeaderboardEntry>) request.getAttribute("leaderboard");
+                    Bean.User currentUser = (Bean.User) session.getAttribute("user");
+                    
+                    if (leaderboard != null && !leaderboard.isEmpty()) {
+                        int rank = 1;
+                        for (Servlets.LeaderboardServlet.LeaderboardEntry row : leaderboard) {
+                            String rowClass = (currentUser != null && row.getUserId() == currentUser.getUserId()) ? "my-row" : "";
+                            String rankClass = "";
+                            if (rank == 1) rankClass = "rank-1";
+                            else if (rank == 2) rankClass = "rank-2";
+                            else if (rank == 3) rankClass = "rank-3";
+                %>
+                            <tr class="<%= rowClass %>">
                                 <td>
-                                    <span class="badge bg-light text-primary fw-semibold">${loop.index + 1}</span>
+                                    <span class="badge bg-light text-primary fw-semibold rank-badge <%= rankClass %>"><%= rank %></span>
                                 </td>
-                                <td>${row.username}</td>
-                                <td>${row.quizTitle}</td>
-                                <td><strong>${row.score}</strong></td>
-                                <td>${row.durationSeconds}</td>
+                                <td><%= row.getUsername() %></td>
+                                <td><%= row.getQuizTitle() %></td>
+                                <td><strong><%= row.getScore() %></strong></td>
+                                <td><%= row.getDurationSeconds() %></td>
                                 <td>
-                                    <fmt:formatDate value="${row.attemptDate}" pattern="MMM dd"/>
+                                    <%= new java.text.SimpleDateFormat("MMM dd").format(row.getAttemptDate()) %>
                                 </td>
                             </tr>
-                        </c:forEach>
-                    </c:when>
-                    <c:otherwise>
+                <%
+                            rank++;
+                        }
+                    } else {
+                %>
                         <tr>
                             <td colspan="6" class="text-center py-4">
                                 <i class="bi bi-inbox display-4 text-muted"></i>
@@ -178,40 +213,50 @@
                                 <small class="text-muted">Complete some quizzes to see rankings!</small>
                             </td>
                         </tr>
-                    </c:otherwise>
-                </c:choose>
+                <%
+                    }
+                %>
                 </tbody>
             </table>
         </div>
 
         <!-- Personal best section -->
-        <c:if test="${not empty personalBest && !isUserInLeaderboard}">
+        <%
+            Servlets.LeaderboardServlet.LeaderboardEntry personalBest = 
+                (Servlets.LeaderboardServlet.LeaderboardEntry) request.getAttribute("personalBest");
+            Boolean isUserInLeaderboard = (Boolean) request.getAttribute("isUserInLeaderboard");
+            
+            if (personalBest != null && (isUserInLeaderboard == null || !isUserInLeaderboard)) {
+        %>
             <div class="mt-4 alert alert-info glass-card border-0">
                 <div class="d-flex align-items-center">
-                    <i class="bi bi-star-fill me-2"></i>
+                    <i class="bi bi-star-fill me-2 text-warning"></i>
                     <div>
                         <strong>Your Personal Best:</strong>
-                        <span class="badge bg-primary ms-2">${personalBest.score} points</span>
-                        <small class="d-block text-muted">
-                            ${personalBest.quizTitle} • ${personalBest.durationSeconds}s • 
-                            <fmt:formatDate value="${personalBest.attemptDate}" pattern="MMM dd, yyyy"/>
+                        <span class="badge bg-warning text-dark ms-2 fw-semibold"><%= personalBest.getScore() %> points</span>
+                        <small class="d-block text-light mt-1">
+                            <%= personalBest.getQuizTitle() %> • <%= personalBest.getDurationSeconds() %>s • 
+                            <%= new java.text.SimpleDateFormat("MMM dd, yyyy").format(personalBest.getAttemptDate()) %>
                         </small>
                     </div>
                 </div>
             </div>
-        </c:if>
+        <%
+            }
+        %>
 
         <!-- Empty state message -->
-        <c:if test="${empty leaderboard && empty personalBest}">
-            <div class="text-center py-5">
-                <i class="bi bi-trophy display-1 text-muted"></i>
-                <h4 class="mt-3">No leaderboard data yet</h4>
-                <p class="text-muted">Start taking quizzes to see rankings!</p>
+        <%
+            if ((leaderboard == null || leaderboard.isEmpty()) && personalBest == null) {
+        %>
+            <div class="text-center py-3">
                 <a href="<%= request.getContextPath() %>/quizzes" class="btn btn-light text-primary">
                     <i class="bi bi-play-fill me-1"></i>Take a Quiz
                 </a>
             </div>
-        </c:if>
+        <%
+            }
+        %>
     </div>
 </main>
 <!-- FOOTER -->

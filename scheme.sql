@@ -146,3 +146,40 @@ CREATE TABLE IF NOT EXISTS user_achievements (
 INSERT INTO users (username, password_hash, display_name) VALUES
 ('alice', '4e40e8ffe0ee32fa53e139147ed559229a5930f89c2204706fc174beb36210b3', 'Alice Wonderland'),
 ('charlie', '2c1743a391305fbf367df8e4f069f9f9a44fbdc7e6a8e6a8e6a8e6a8e6a8e6a8e', 'Charlie Chaplin');
+
+-- Sample quizzes for testing
+INSERT INTO quizzes (owner_id, title, description, random_order, multiple_pages, immediate_correction) VALUES
+(1, 'General Knowledge Quiz', 'Test your general knowledge with this comprehensive quiz', FALSE, FALSE, TRUE),
+(1, 'Math Challenge', 'Advanced mathematics problems for brain training', TRUE, TRUE, FALSE),
+(2, 'History Trivia', 'Journey through time with historical facts and events', FALSE, FALSE, TRUE),
+(2, 'Science Quiz', 'Explore the wonders of science and discovery', TRUE, FALSE, TRUE);
+
+-- Sample questions for the first quiz
+INSERT INTO questions (quiz_id, question_type, question_text, question_order) VALUES
+(1, 'multiple_choice', 'What is the capital of France?', 1),
+(1, 'multiple_choice', 'Which planet is known as the Red Planet?', 2),
+(1, 'question_response', 'What is 2 + 2?', 3);
+
+-- Sample choices for multiple choice questions
+INSERT INTO question_choices (question_id, choice_text, is_correct) VALUES
+(1, 'London', FALSE),
+(1, 'Paris', TRUE),
+(1, 'Berlin', FALSE),
+(1, 'Madrid', FALSE),
+(2, 'Earth', FALSE),
+(2, 'Mars', TRUE),
+(2, 'Venus', FALSE),
+(2, 'Jupiter', FALSE);
+
+-- Sample answers for question response
+INSERT INTO question_answers (question_id, answer_text) VALUES
+(3, '4');
+
+-- Sample quiz attempts for leaderboard testing
+INSERT INTO quiz_attempts (user_id, quiz_id, score, duration_seconds, attempt_date) VALUES
+(1, 1, 85, 120, NOW() - INTERVAL 1 DAY),
+(2, 1, 92, 95, NOW() - INTERVAL 2 HOUR),
+(1, 2, 78, 180, NOW() - INTERVAL 3 DAY),
+(2, 2, 88, 150, NOW() - INTERVAL 1 HOUR),
+(1, 3, 95, 90, NOW() - INTERVAL 30 MINUTE),
+(2, 3, 87, 110, NOW() - INTERVAL 5 HOUR);
