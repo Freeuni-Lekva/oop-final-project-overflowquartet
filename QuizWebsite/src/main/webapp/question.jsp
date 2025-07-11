@@ -36,6 +36,11 @@
       background-color: #0d6efd !important;
       border-color: #0d6efd !important;
     }
+    .question-image {
+      max-height: 400px;
+      max-width: 100%;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+    }
     footer {
       font-size: .875rem;
       color: rgba(255,255,255,.65);
@@ -120,6 +125,18 @@
       </div>
       <div class="mb-4">
         <h5 class="fw-semibold">${question.questionText}</h5>
+        
+        <!-- Display image for picture-response questions -->
+        <c:if test="${question.questionType == 'picture_response' and not empty question.imageUrl}">
+          <div class="text-center mb-4">
+            <img src="${question.imageUrl}" alt="Question Image" 
+                 class="img-fluid rounded question-image" 
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <div class="alert alert-warning mt-2" style="display: none;">
+              <i class="bi bi-exclamation-triangle"></i> Sorry, we couldn't load the image for this question. The quiz creator may need to update the image URL.
+            </div>
+          </div>
+        </c:if>
       </div>
       <c:choose>
         <c:when test="${showNext}">
@@ -202,6 +219,18 @@
         <c:forEach var="q" items="${questions}" varStatus="st">
           <div class="mb-4 p-3" style="background: rgba(255, 255, 255, 0.1); border-radius: 0.5rem;">
             <h5 class="fw-semibold mb-3">Question ${st.index + 1}: ${q.questionText}</h5>
+            
+            <!-- Display image for picture-response questions in single-page mode -->
+            <c:if test="${q.questionType == 'picture_response' and not empty q.imageUrl}">
+              <div class="text-center mb-3">
+                <img src="${q.imageUrl}" alt="Question Image" 
+                     class="img-fluid rounded question-image" 
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div class="alert alert-warning mt-2" style="display: none;">
+                  <i class="bi bi-exclamation-triangle"></i> Sorry, we couldn't load the image for this question. The quiz creator may need to update the image URL.
+                </div>
+              </div>
+            </c:if>
             <c:choose>
               <c:when test="${q.questionType == 'multiple_choice'}">
                 <c:forEach var="c" items="${q.choices}">
