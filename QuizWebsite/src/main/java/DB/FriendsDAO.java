@@ -191,6 +191,8 @@ public class FriendsDAO {
         }
     }
 
+
+
     /**
      * Possible statuses in the friends table.
      */
