@@ -33,8 +33,9 @@
       border-color: rgba(255, 255, 255, 0.3);
     }
     .table td {
-      color: #e8e8e8;
-      border-color: rgba(255, 255, 255, 0.1);
+      color: #333;
+      background: rgba(255, 255, 255, 0.9);
+      border-color: rgba(255, 255, 255, 0.3);
     }
     footer {
       font-size: .875rem;
@@ -89,6 +90,9 @@
         <a class="nav-link" href="<%= request.getContextPath() %>/history">
           <i class="bi bi-clock-history"></i> History
         </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="<%= request.getContextPath() %>/achievements"><i class="bi bi-award-fill"></i> Achievements</a>
       </li>
     </ul>
     <a href="<%= request.getContextPath() %>/LogoutServlet" class="btn btn-outline-light btn-sm">
