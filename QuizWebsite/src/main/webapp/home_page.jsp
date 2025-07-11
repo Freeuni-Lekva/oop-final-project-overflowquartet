@@ -23,6 +23,25 @@
         }
         .glass-card h5, .glass-card h6, .glass-card p { color:#fff; }
         .dashboard .glass-card { padding:1.5rem; }
+        .scrollable-content {
+            max-height: 200px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.3) transparent;
+        }
+        .scrollable-content::-webkit-scrollbar {
+            width: 6px;
+        }
+        .scrollable-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .scrollable-content::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 3px;
+        }
+        .scrollable-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.5);
+        }
         footer { font-size:.875rem; color:rgba(255,255,255,.65); }
     </style>
 </head>
@@ -108,17 +127,21 @@
                         </p>
                     </c:when>
                     <c:otherwise>
-                        <ul class="list-unstyled mb-0">
-                            <c:forEach var="q" items="${myCreatedQuizzes}">
-                                <li class="mb-2">
-                                    <i class="bi bi-lightbulb-fill me-1"></i>
-                                    <a href="${ctx}/quiz-summary?quizId=${q.quizId}" class="link-light fw-semibold">
-                                            ${q.title}
-                                    </a>
-                                    <span class="small ms-2">by <a href="${ctx}/profile?id=${q.ownerId}" class="link-light">${q.ownerUsername}</a></span>
-                                </li>
-                            </c:forEach>
-                        </ul>
+
+                        <div class="scrollable-content">
+                            <ul class="list-unstyled mb-0">
+                                <c:forEach var="q" items="${myCreatedQuizzes}">
+                                    <li class="mb-2">
+                                        <i class="bi bi-lightbulb-fill me-1"></i>
+                                        <a href="${ctx}/quiz-summary?quizId=${q.quizId}" class="link-light fw-semibold">
+                                                ${q.title}
+                                        </a>
+                                        <span class="small ms-2">by <a href="${ctx}/profile?id=${q.ownerId}" class="link-light">${q.ownerUsername}</a></span>
+                                    </li>   
+                                </c:forEach>
+                            </ul>
+                        </div>
+
                     </c:otherwise>
                 </c:choose>
             </div>
@@ -135,15 +158,17 @@
                         </p>
                     </c:when>
                     <c:otherwise>
-                        <ul class="list-inline mb-0">
-                            <c:forEach var="f" items="${myFriends}">
-                                <li class="list-inline-item me-3">
-                                    <a href="${ctx}/profile?id=${f.userId}" class="link-light">
-                                        <i class="bi bi-person-circle"></i> ${f.displayName}
-                                    </a>
-                                </li>
-                            </c:forEach>
-                        </ul>
+                        <div class="scrollable-content">
+                            <ul class="list-inline mb-0">
+                                <c:forEach var="f" items="${myFriends}">
+                                    <li class="list-inline-item me-3 mb-2">
+                                        <a href="${ctx}/profile?id=${f.userId}" class="link-light">
+                                            <i class="bi bi-person-circle"></i> ${f.displayName}
+                                        </a>
+                                    </li>
+                                </c:forEach>
+                            </ul>
+                        </div>
                     </c:otherwise>
                 </c:choose>
             </div>
@@ -158,35 +183,76 @@
                         <p>No recent activity from your friends.</p>
                     </c:when>
                     <c:otherwise>
-                        <ul class="mb-0">
-                            <c:forEach var="row" items="${friendsActivity}">
-                                <li>
-                                    <strong>${row.user.displayName}</strong> scored
-                                    <span class="fw-semibold">${row.attempt.score}</span> on
-                                    <a href="${ctx}/startQuiz?quizId=${row.quiz.quizId}" class="link-light">
-                                            ${row.quiz.title}
-                                    </a>
-                                    <small class="text-muted">
-                                        (<fmt:formatDate value="${row.attempt.attemptDate}" pattern="MMM dd"/>)
-                                    </small>
-                                </li>
-                            </c:forEach>
-                        </ul>
+                        <div class="scrollable-content">
+                            <ul class="mb-0">
+                                <c:forEach var="row" items="${friendsActivity}">
+                                    <li class="mb-2">
+                                        <strong>${row.user.displayName}</strong> scored
+                                        <span class="fw-semibold">${row.attempt.score}</span> on
+                                        <a href="${ctx}/startQuiz?quizId=${row.quiz.quizId}" class="link-light">
+                                                ${row.quiz.title}
+                                        </a>
+                                        <small class="text-muted">
+                                            (<fmt:formatDate value="${row.attempt.attemptDate}" pattern="MMM dd"/>)
+                                        </small>
+                                    </li>
+                                </c:forEach>
+                            </ul>
+                        </div>
                     </c:otherwise>
                 </c:choose>
             </div>
         </div>
     </section>
 
+    <!-- POPULAR QUIZZES -->
+    <section class="mb-5">
+        <h2 class="h4 fw-semibold mb-3">
+            <i class="bi bi-fire"></i> Popular Quizzes
+        </h2>
+        <div class="row g-4">
+            <c:forEach var="quiz" items="${popularQuizzes}">
+                <div class="col-12 col-sm-6 col-lg-4">
+                    <div class="glass-card p-4 h-100 d-flex flex-column position-relative">
+                        <!-- Popular badge -->
+                        <div class="position-absolute top-0 end-0 mt-2 me-2">
+                            <span class="badge bg-warning text-dark">
+                                <i class="bi bi-fire"></i> Popular
+                            </span>
+                        </div>
+                        <h5 class="fw-semibold mb-1">
+                            <i class="bi bi-lightbulb-fill me-1"></i>
+                            <a href="${ctx}/quiz-summary?quizId=${quiz.quizId}" class="link-light text-decoration-none">${quiz.title}</a>
+                            <span class="small ms-2">by <a href="${ctx}/profile?id=${quiz.ownerId}" class="link-light">${quiz.ownerUsername}</a></span>
+                        </h5>
+                        <p class="small flex-grow-1">${quiz.description}</p>
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <span class="small">
+                                <i class="bi bi-question-circle"></i> ${quiz.questionCount} Qs
+                                <span class="ms-2"><i class="bi bi-people"></i> ${quiz.attemptCount} attempts</span>
+                            </span>
+                            <a href="${ctx}/startQuiz?quizId=${quiz.quizId}"
+                               class="btn btn-sm btn-warning text-dark fw-semibold">
+                                <i class="bi bi-play-fill"></i> Play
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </c:forEach>
+        </div>
+    </section>
+
     <!-- FEATURED QUIZZES -->
     <section class="mb-5">
-        <h2 class="h4 fw-semibold mb-3">Featured Quizzes</h2>
+        <h2 class="h4 fw-semibold mb-3">3 Recently Created Quizzes</h2>
         <div class="row g-4">
-            <c:forEach var="quiz" items="${featuredQuizzes}">
+            <c:forEach var="quiz" items="${featuredQuizzes}" varStatus="status">
+                <c:if test="${status.index < 3}">
                 <div class="col-12 col-sm-6 col-lg-4">
                     <div class="glass-card p-4 h-100 d-flex flex-column">
                         <h5 class="fw-semibold mb-1">
-                            <i class="bi bi-lightbulb-fill me-1"></i> ${quiz.title}
+                            <i class="bi bi-lightbulb-fill me-1"></i>
+                            <a href="${ctx}/quiz-summary?quizId=${quiz.quizId}" class="link-light text-decoration-none">${quiz.title}</a>
                             <span class="small ms-2">by <a href="${ctx}/profile?id=${quiz.ownerId}" class="link-light">${quiz.ownerUsername}</a></span>
                         </h5>
                         <p class="small flex-grow-1">${quiz.description}</p>
@@ -197,6 +263,7 @@
                         </div>
                     </div>
                 </div>
+                </c:if>
             </c:forEach>
         </div>
     </section>
@@ -208,24 +275,53 @@
         </h2>
         <c:choose>
             <c:when test="${empty recentAttemptsWithQuiz}">
-                <p>No recent quiz attempts yet. Start playing quizzes!</p>
+                <div class="glass-card p-4 text-center">
+                    <i class="bi bi-clock-history fs-1 text-light mb-3"></i>
+                    <h5 class="fw-semibold mb-2">No Recent Activity</h5>
+                    <p class="text-light mb-3">You haven't taken any quizzes yet.</p>
+                    <a href="${ctx}/quizzes" class="btn btn-light text-primary fw-semibold">
+                        <i class="bi bi-play-fill me-1"></i>Start Playing
+                    </a>
+                </div>
             </c:when>
             <c:otherwise>
-                <div class="table-responsive">
-                    <table class="table table-sm table-bordered table-glass align-middle">
-                        <thead>
-                        <tr><th>Quiz</th><th>Score</th><th>Date</th></tr>
-                        </thead>
-                        <tbody>
+                <div class="glass-card p-4">
+                    <div class="row g-3">
                         <c:forEach var="row" items="${recentAttemptsWithQuiz}">
-                            <tr>
-                                <td>${row.quiz.title}</td>
-                                <td>${row.attempt.score}</td>
-                                <td><fmt:formatDate value="${row.attempt.attemptDate}" pattern="MMM dd, yyyy HH:mm"/></td>
-                            </tr>
+                            <div class="col-12">
+                                <div class="d-flex align-items-center justify-content-between p-3 rounded" 
+                                     style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);">
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3">
+                                            <i class="bi bi-lightbulb-fill fs-4" style="color: #ffd700;"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-1 fw-semibold">
+                                                <a href="${ctx}/startQuiz?quizId=${row.quiz.quizId}" class="link-light text-decoration-none">
+                                                    ${row.quiz.title}
+                                                </a>
+                                            </h6>
+                                            <small class="text-light">
+                                                <i class="bi bi-calendar3 me-1"></i>
+                                                <fmt:formatDate value="${row.attempt.attemptDate}" pattern="MMM dd, yyyy 'at' HH:mm"/>
+                                            </small>
+                                        </div>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="badge bg-success fs-6 px-3 py-2">
+                                            <i class="bi bi-trophy-fill me-1"></i>
+                                            Score: ${row.attempt.score}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </c:forEach>
-                        </tbody>
-                    </table>
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="${ctx}/history" class="btn btn-outline-light btn-sm">
+                            <i class="bi bi-clock-history me-1"></i>View Full History
+                        </a>
+                    </div>
                 </div>
             </c:otherwise>
         </c:choose>
