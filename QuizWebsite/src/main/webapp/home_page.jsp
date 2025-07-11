@@ -51,28 +51,42 @@
 
 <!-- ─── TOP NAV ─────────────────────────────────────────────────────── -->
 <nav class="navbar navbar-expand-lg navbar-dark glass-card mx-3 mt-3 px-3">
-    <a class="navbar-brand fw-semibold" href="<%= request.getContextPath() %>/">QuizSite</a>
-
+    <a class="navbar-brand fw-bold d-flex align-items-center"
+       href="<%= request.getContextPath() %>/HomeServlet">
+        Quizzmosis
+    </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
         <span class="navbar-toggler-icon"></span>
     </button>
-
     <div class="collapse navbar-collapse" id="navMain">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
-            <li class="nav-item"><a class="nav-link" href="<%= request.getContextPath() %>/quizzes">Quizzes</a></li>
-            <li class="nav-item"><a class="nav-link" href="<%= request.getContextPath() %>/create">Create Quiz</a></li>
-            <li class="nav-item"><a class="nav-link" href="<%= request.getContextPath() %>/leaderboard.jsp">Leaderboard</a></li>
-            <li class="nav-item"><a class="nav-link" href="<%= request.getContextPath() %>/friends.jsp">Friends</a></li>
-
+        <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+                <a class="nav-link active fw-semibold"
+                   href="<%= request.getContextPath() %>/HomeServlet">
+                    <i class="bi bi-house-door-fill"></i> Home
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="<%= request.getContextPath() %>/quizzes"><i class="bi bi-list-check"></i> Quizzes</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="<%= request.getContextPath() %>/create"><i class="bi bi-plus-circle"></i> Create Quiz</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="<%= request.getContextPath() %>/leaderboard.jsp"><i class="bi bi-trophy-fill"></i> Leaderboard</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="<%= request.getContextPath() %>/friends.jsp"><i class="bi bi-people-fill"></i> Friends</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="<%= request.getContextPath() %>/messages"><i class="bi bi-envelope-fill"></i> Messages</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="<%= request.getContextPath() %>/history"><i class="bi bi-clock-history"></i> History</a>
+            </li>
         </ul>
-
-        <!-- show username if logged in -->
-        <span class="navbar-text me-3">
-        <!-- ${sessionScope.user.displayName} -->
-      </span>
         <a href="<%= request.getContextPath() %>/LogoutServlet" class="btn btn-outline-light btn-sm">
-            Log out
+            <i class="bi bi-box-arrow-right"></i> Log&nbsp;out
         </a>
     </div>
 </nav>
@@ -125,6 +139,38 @@
             </div>
         </div>
     </div>
+</section>
+
+<!-- ─── RECENT QUIZ HISTORY ─────────────────────────────────────────── -->
+<section class="container pb-5">
+    <h2 class="h4 fw-semibold mb-3"><i class="bi bi-clock-history"></i> Recent Quiz History</h2>
+    <c:choose>
+        <c:when test="${empty recentAttemptsWithQuiz}">
+            <p class="text-light">No recent quiz attempts yet. Start playing quizzes!</p>
+        </c:when>
+        <c:otherwise>
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered table-glass align-middle">
+                    <thead>
+                        <tr>
+                            <th>Quiz</th>
+                            <th>Score</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <c:forEach var="row" items="${recentAttemptsWithQuiz}">
+                            <tr>
+                                <td>${row.quiz != null ? row.quiz.title : 'Unknown Quiz'}</td>
+                                <td>${row.attempt.score}</td>
+                                <td><fmt:formatDate value="${row.attempt.attemptDate}" pattern="MMM dd, yyyy HH:mm"/></td>
+                            </tr>
+                        </c:forEach>
+                    </tbody>
+                </table>
+            </div>
+        </c:otherwise>
+    </c:choose>
 </section>
 
 <!-- ─── FOOTER ──────────────────────────────────────────────────────── -->

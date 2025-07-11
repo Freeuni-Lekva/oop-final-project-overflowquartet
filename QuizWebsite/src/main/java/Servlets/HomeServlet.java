@@ -10,6 +10,8 @@ import Bean.User;
 import Bean.Quiz;
 import DB.QuizDAO;
 import DB.UserDAO;
+import DB.QuizAttemptDAO;
+import Bean.QuizAttempt;
 
 @WebServlet("/HomeServlet")
 public class HomeServlet extends HttpServlet {
@@ -28,6 +30,7 @@ public class HomeServlet extends HttpServlet {
 
         // Initialize DAOs
         QuizDAO quizDAO = new QuizDAO();
+        QuizAttemptDAO attemptDAO = new QuizAttemptDAO();
 
         try {
             // Prepare featured quizzes data
@@ -50,6 +53,17 @@ public class HomeServlet extends HttpServlet {
             // Prepare announcements
             List<String> announcements = prepareAnnouncements();
             req.setAttribute("announcements", announcements);
+
+            // Prepare recent quiz attempts (real data)
+            List<QuizAttempt> allAttempts = attemptDAO.getAttemptsByUser(userId);
+            List<AttemptWithQuiz> recentAttemptsWithQuiz = new ArrayList<>();
+            int count = 0;
+            for (QuizAttempt a : allAttempts) {
+                if (count++ >= 3) break;
+                Quiz quiz = quizDAO.getQuizById(a.getQuizId());
+                recentAttemptsWithQuiz.add(new AttemptWithQuiz(a, quiz));
+            }
+            req.setAttribute("recentAttemptsWithQuiz", recentAttemptsWithQuiz);
 
             // Forward to home page
             RequestDispatcher dispatcher = req.getRequestDispatcher("/home_page.jsp");
@@ -100,5 +114,14 @@ public class HomeServlet extends HttpServlet {
     private double getAverageScore(QuizDAO quizDAO, int userId) {
         // TODO: Implement actual database query
         return 78.5; // Sample data
+    }
+
+    public static class AttemptWithQuiz {
+        public QuizAttempt attempt;
+        public Quiz quiz;
+        public AttemptWithQuiz(QuizAttempt attempt, Quiz quiz) {
+            this.attempt = attempt;
+            this.quiz = quiz;
+        }
     }
 } 
