@@ -72,7 +72,7 @@
                 <a class="nav-link" href="<%= request.getContextPath() %>/quizzes"><i class="bi bi-list-check"></i> Quizzes</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="<%= request.getContextPath() %>/create"><i class="bi bi-plus-circle"></i> Create Quiz</a>
+                <a class="nav-link" href="<%= request.getContextPath() %>/create.jsp"><i class="bi bi-plus-circle"></i> Create Quiz</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="<%= request.getContextPath() %>/leaderboard.jsp"><i class="bi bi-trophy-fill"></i> Leaderboard</a>
