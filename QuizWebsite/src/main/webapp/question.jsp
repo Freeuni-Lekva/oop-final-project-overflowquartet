@@ -119,66 +119,81 @@
           <div class="progress-bar" role="progressbar" style="width: ${(page / total) * 100}%"></div>
         </div>
       </div>
-      
       <div class="mb-4">
         <h5 class="fw-semibold">${question.questionText}</h5>
       </div>
-      
-      <form action="<%= request.getContextPath() %>/submitAnswer" method="post">
-        <input type="hidden" name="questionId" value="${question.questionId}"/>
-        <input type="hidden" name="page" value="${page}"/>
-        <input type="hidden" name="total" value="${total}"/>
-        
-        <c:choose>
-          <c:when test="${question.questionType == 'multiple_choice'}">
-            <div class="mb-4">
-              <c:forEach var="c" items="${question.choices}">
-                <div class="form-check mb-3">
-                  <input class="form-check-input" type="radio"
-                         name="answer" id="c${c.choiceId}"
-                         value="${c.choiceId}" required/>
-                  <label class="form-check-label" for="c${c.choiceId}">
-                    ${c.choiceText}
-                  </label>
-                </div>
-              </c:forEach>
+      <c:choose>
+        <c:when test="${showNext}">
+          <c:if test="${not empty feedbackCorrect}">
+            <div class="alert ${feedbackCorrect ? 'alert-success' : 'alert-danger'} mb-4">
+              <i class="bi ${feedbackCorrect ? 'bi-check-circle' : 'bi-x-circle'}"></i>
+              You answered "${userAnswer}" —
+              <strong>${feedbackCorrect ? 'Correct!' : 'Incorrect.'}</strong>
             </div>
-          </c:when>
-          <c:otherwise>
-            <div class="mb-4">
-              <input type="text" name="answerText" class="form-control form-control-lg" 
-                     placeholder="Enter your answer..." required/>
-            </div>
-          </c:otherwise>
-        </c:choose>
-
-        <c:if test="${not empty feedbackCorrect}">
-          <div class="alert ${feedbackCorrect ? 'alert-success' : 'alert-danger'} mb-4">
-            <i class="bi ${feedbackCorrect ? 'bi-check-circle' : 'bi-x-circle'}"></i>
-            You answered "${userAnswer}" —
-            <strong>${feedbackCorrect ? 'Correct!' : 'Incorrect.'}</strong>
-          </div>
-        </c:if>
-
-        <div class="d-flex justify-content-between">
-          <c:if test="${page > 1}">
-            <a href="<%= request.getContextPath() %>/showQuestion?page=${page - 1}" 
-               class="btn btn-outline-light">
-              <i class="bi bi-arrow-left"></i> Previous
-            </a>
           </c:if>
-          <button class="btn btn-light text-primary fw-semibold" type="submit">
+          <div class="d-flex justify-content-end">
             <c:choose>
-              <c:when test="${page == total}">
-                <i class="bi bi-check-circle"></i> Finish Quiz
+              <c:when test="${page < total}">
+                <a href="<%= request.getContextPath() %>/showQuestion?page=${page + 1}" class="btn btn-primary">
+                  Next Question <i class="bi bi-arrow-right"></i>
+                </a>
               </c:when>
               <c:otherwise>
-                <i class="bi bi-arrow-right"></i> Next Question
+                <a href="<%= request.getContextPath() %>/finishQuiz" class="btn btn-success">
+                  Finish Quiz <i class="bi bi-check-circle"></i>
+                </a>
               </c:otherwise>
             </c:choose>
-          </button>
-        </div>
-      </form>
+          </div>
+        </c:when>
+        <c:otherwise>
+          <form action="<%= request.getContextPath() %>/submitAnswer" method="post">
+            <input type="hidden" name="questionId" value="${question.questionId}"/>
+            <input type="hidden" name="page" value="${page}"/>
+            <input type="hidden" name="total" value="${total}"/>
+            <c:choose>
+              <c:when test="${question.questionType == 'multiple_choice'}">
+                <div class="mb-4">
+                  <c:forEach var="c" items="${question.choices}">
+                    <div class="form-check mb-3">
+                      <input class="form-check-input" type="radio"
+                             name="answer" id="c${c.choiceId}"
+                             value="${c.choiceId}" required/>
+                      <label class="form-check-label" for="c${c.choiceId}">
+                        ${c.choiceText}
+                      </label>
+                    </div>
+                  </c:forEach>
+                </div>
+              </c:when>
+              <c:otherwise>
+                <div class="mb-4">
+                  <input type="text" name="answerText" class="form-control form-control-lg" 
+                         placeholder="Enter your answer..." required/>
+                </div>
+              </c:otherwise>
+            </c:choose>
+            <div class="d-flex justify-content-between">
+              <c:if test="${page > 1}">
+                <a href="<%= request.getContextPath() %>/showQuestion?page=${page - 1}" 
+                   class="btn btn-outline-light">
+                  <i class="bi bi-arrow-left"></i> Previous
+                </a>
+              </c:if>
+              <button class="btn btn-light text-primary fw-semibold" type="submit">
+                <c:choose>
+                  <c:when test="${page == total}">
+                    <i class="bi bi-check-circle"></i> Finish Quiz
+                  </c:when>
+                  <c:otherwise>
+                    <i class="bi bi-arrow-right"></i> Next Question
+                  </c:otherwise>
+                </c:choose>
+              </button>
+            </div>
+          </form>
+        </c:otherwise>
+      </c:choose>
     </c:if>
 
     <c:if test="${not empty questions}">
