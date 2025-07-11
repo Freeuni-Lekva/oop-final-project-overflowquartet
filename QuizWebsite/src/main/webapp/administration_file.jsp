@@ -204,24 +204,14 @@
 
 <!-- ══ BOOTSTRAP & MODAL SCRIPT ═════════════════════════════════════ -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
-    /* Fill delete modals with row data */
-    const userModal = document.getElementById('confirmUserDelete');
-    userModal.addEventListener('show.bs.modal', event => {
-        const btn = event.relatedTarget;
-        document.getElementById('delUserName').textContent = btn.dataset.username;
-        document.getElementById('delUserId').textContent   = btn.dataset.userid;
-        document.getElementById('userDeleteInput').value   = btn.dataset.userid;
-    });
-
-    const quizModal = document.getElementById('confirmQuizDelete');
-    quizModal.addEventListener('show.bs.modal', event => {
-        const btn = event.relatedTarget;
-        document.getElementById('delQuizTitle').textContent = btn.dataset.quiztitle;
-        document.getElementById('delQuizId').textContent    = btn.dataset.quizid;
-        document.getElementById('quizDeleteInput').value    = btn.dataset.quizid;
-    });
+// Force reload on back navigation to prevent showing cached content after logout
+window.addEventListener('pageshow', function(event) {
+    if (event.persisted) {
+        window.location.reload();
+    }
+});
 </script>
-
 </body>
 </html>
