@@ -42,11 +42,26 @@ public class LeaderboardServlet extends HttpServlet {
             List<Quiz> allQuizzes = quizDAO.getAllQuizzes();
             request.setAttribute("allQuizzes", allQuizzes);
 
+            // Debug output
+            System.out.println("=== LeaderboardServlet Debug ===");
+            System.out.println("Quiz ID param: '" + quizIdParam + "'");
+            System.out.println("Timeframe param: '" + timeframe + "'");
+            System.out.println("All quizzes count: " + allQuizzes.size());
+            if (allQuizzes.isEmpty()) {
+                System.out.println("WARNING: No quizzes found in database!");
+            } else {
+                for (Quiz quiz : allQuizzes) {
+                    System.out.println("  Quiz: ID=" + quiz.getQuizId() + ", Title='" + quiz.getTitle() + "', Owner='" + quiz.getOwnerUsername() + "'");
+                }
+            }
+
             // Get leaderboard
             List<LeaderboardEntry> leaderboard = getLeaderboardData(quizIdParam, timeframe);
+            System.out.println("DEBUG: Leaderboard entries found: " + leaderboard.size());
 
             // Get user's personal best (for this quiz or globally)
             LeaderboardEntry personalBest = getUserPersonalBest(user.getUserId(), quizIdParam, timeframe);
+            System.out.println("DEBUG: Personal best found: " + (personalBest != null ? "Yes" : "No"));
             request.setAttribute("leaderboard", leaderboard);
             request.setAttribute("personalBest", personalBest);
 
@@ -80,8 +95,13 @@ public class LeaderboardServlet extends HttpServlet {
 
         // Quiz filter
         if (quizIdParam != null && !quizIdParam.isEmpty()) {
-            sql.append("AND qa.quiz_id = ? ");
-            params.add(Integer.parseInt(quizIdParam));
+            try {
+                int quizId = Integer.parseInt(quizIdParam);
+                sql.append("AND qa.quiz_id = ? ");
+                params.add(quizId);
+            } catch (NumberFormatException e) {
+                // Invalid quizId, skip filtering by quiz
+            }
         }
 
         // Timeframe filter
@@ -89,10 +109,17 @@ public class LeaderboardServlet extends HttpServlet {
             sql.append("AND qa.attempt_date >= ? ");
             Calendar cal = Calendar.getInstance();
             switch (timeframe) {
-                case "week":  cal.add(Calendar.WEEK_OF_YEAR, -1); break;
-                case "month": cal.add(Calendar.MONTH, -1); break;
+                case "week":  
+                    cal.add(Calendar.WEEK_OF_YEAR, -1); 
+                    break;
+                case "month": 
+                    cal.add(Calendar.MONTH, -1); 
+                    break;
                 case "today":
-                    cal.add(Calendar.DAY_OF_YEAR, -1);
+                    cal.set(Calendar.HOUR_OF_DAY, 0);
+                    cal.set(Calendar.MINUTE, 0);
+                    cal.set(Calendar.SECOND, 0);
+                    cal.set(Calendar.MILLISECOND, 0);
                     break;
             }
             params.add(new Timestamp(cal.getTimeInMillis()));
@@ -100,6 +127,9 @@ public class LeaderboardServlet extends HttpServlet {
 
         sql.append("ORDER BY qa.score DESC, qa.duration_seconds ASC, qa.attempt_date DESC ");
         sql.append("LIMIT 100");
+
+        System.out.println("DEBUG: Executing SQL: " + sql.toString());
+        System.out.println("DEBUG: Parameters: " + params);
 
         try (Connection conn = DB.DBConnector.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {
@@ -120,8 +150,11 @@ public class LeaderboardServlet extends HttpServlet {
                 }
             }
         } catch (SQLException e) {
+            System.out.println("DEBUG: SQL Error: " + e.getMessage());
             e.printStackTrace();
         }
+        
+        System.out.println("DEBUG: Found " + leaderboard.size() + " leaderboard entries");
         return leaderboard;
     }
 
@@ -140,18 +173,30 @@ public class LeaderboardServlet extends HttpServlet {
         params.add(userId);
 
         if (quizIdParam != null && !quizIdParam.isEmpty()) {
-            sql.append("AND qa.quiz_id = ? ");
-            params.add(Integer.parseInt(quizIdParam));
+            try {
+                int quizId = Integer.parseInt(quizIdParam);
+                sql.append("AND qa.quiz_id = ? ");
+                params.add(quizId);
+            } catch (NumberFormatException e) {
+                // Invalid quizId, skip filtering by quiz
+            }
         }
 
         if (!"all".equals(timeframe)) {
             sql.append("AND qa.attempt_date >= ? ");
             Calendar cal = Calendar.getInstance();
             switch (timeframe) {
-                case "week":  cal.add(Calendar.WEEK_OF_YEAR, -1); break;
-                case "month": cal.add(Calendar.MONTH, -1); break;
+                case "week":  
+                    cal.add(Calendar.WEEK_OF_YEAR, -1); 
+                    break;
+                case "month": 
+                    cal.add(Calendar.MONTH, -1); 
+                    break;
                 case "today":
-                    cal.add(Calendar.DAY_OF_YEAR, -1);
+                    cal.set(Calendar.HOUR_OF_DAY, 0);
+                    cal.set(Calendar.MINUTE, 0);
+                    cal.set(Calendar.SECOND, 0);
+                    cal.set(Calendar.MILLISECOND, 0);
                     break;
             }
             params.add(new Timestamp(cal.getTimeInMillis()));

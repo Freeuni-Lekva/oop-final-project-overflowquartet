@@ -219,12 +219,14 @@ public class QuizDAO {
 
     public List<Quiz> getAllQuizzes() {
         List<Quiz> list = new ArrayList<>();
-        String sql = "SELECT * FROM quizzes ORDER BY creation_date DESC";
+        String sql = "SELECT q.*, u.username AS owner_username FROM quizzes q LEFT JOIN users u ON q.owner_id = u.user_id ORDER BY q.creation_date DESC";
         try (Connection conn = DBConnector.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    list.add(extractQuiz(rs));
+                    Quiz quiz = extractQuiz(rs);
+                    quiz.setOwnerUsername(rs.getString("owner_username"));
+                    list.add(quiz);
                 }
             }
         } catch (SQLException e) {
