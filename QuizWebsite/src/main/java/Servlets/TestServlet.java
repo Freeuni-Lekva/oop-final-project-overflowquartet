@@ -1,50 +1,79 @@
 package Servlets;
 
-import Bean.Question;
-import DB.QuestionDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.SQLException;
-import java.util.List;
+import java.sql.Connection;
 
 @WebServlet("/test")
 public class TestServlet extends HttpServlet {
     
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) 
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
-        resp.setContentType("text/html;charset=UTF-8");
-        resp.getWriter().println("<html><body>");
-        resp.getWriter().println("<h1>Test Servlet</h1>");
+        response.setContentType("text/plain");
+        response.setCharacterEncoding("UTF-8");
         
         try {
-            QuestionDAO questionDao = new QuestionDAO();
-            
-            // Test with quiz ID 33 (which we know has questions)
-            List<Question> questions = questionDao.getQuestionsForQuiz(33, false);
-            
-            resp.getWriter().println("<p>Found " + questions.size() + " questions for quiz 33</p>");
-            
-            for (Question q : questions) {
-                resp.getWriter().println("<p>Question ID: " + q.getQuestionId() + "</p>");
-                resp.getWriter().println("<p>Question Text: " + q.getQuestionText() + "</p>");
-                resp.getWriter().println("<p>Question Type: " + q.getQuestionType() + "</p>");
-                if (q.getAnswers() != null) {
-                    resp.getWriter().println("<p>Answers: " + q.getAnswers() + "</p>");
-                }
-                resp.getWriter().println("<hr>");
+            // Test database connection
+            Connection conn = DB.DBConnector.getConnection();
+            if (conn != null && !conn.isClosed()) {
+                response.getWriter().write("Database connection: OK\n");
+                conn.close();
+            } else {
+                response.getWriter().write("Database connection: FAILED\n");
             }
             
-        } catch (SQLException e) {
-            resp.getWriter().println("<p>Error: " + e.getMessage() + "</p>");
+            // Test if we can reach this servlet
+            response.getWriter().write("TestServlet: OK\n");
+            response.getWriter().write("Request URI: " + request.getRequestURI() + "\n");
+            response.getWriter().write("Context Path: " + request.getContextPath() + "\n");
+            
+            // Test quiz retrieval
+            String quizIdParam = request.getParameter("quizId");
+            if (quizIdParam != null) {
+                try {
+                    int quizId = Integer.parseInt(quizIdParam);
+                    DB.QuizDAO quizDAO = new DB.QuizDAO();
+                    Bean.Quiz quiz = quizDAO.getQuizById(quizId);
+                    if (quiz != null) {
+                        response.getWriter().write("Quiz found: ID=" + quiz.getQuizId() + ", Title=" + quiz.getTitle() + "\n");
+                    } else {
+                        response.getWriter().write("Quiz not found for ID: " + quizId + "\n");
+                    }
+                } catch (NumberFormatException e) {
+                    response.getWriter().write("Invalid quiz ID: " + quizIdParam + "\n");
+                }
+            }
+            
+        } catch (Exception e) {
+            response.getWriter().write("Error: " + e.getMessage() + "\n");
             e.printStackTrace();
         }
+    }
+    
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
         
-        resp.getWriter().println("</body></html>");
+        response.setContentType("text/plain");
+        response.setCharacterEncoding("UTF-8");
+        
+        response.getWriter().write("TestServlet POST: OK\n");
+        response.getWriter().write("Request method: " + request.getMethod() + "\n");
+        response.getWriter().write("Content-Type: " + request.getContentType() + "\n");
+        
+        // Echo back the parameters
+        String action = request.getParameter("action");
+        String quizId = request.getParameter("quizId");
+        String friendId = request.getParameter("friendId");
+        
+        response.getWriter().write("action: " + action + "\n");
+        response.getWriter().write("quizId: " + quizId + "\n");
+        response.getWriter().write("friendId: " + friendId + "\n");
     }
 } 

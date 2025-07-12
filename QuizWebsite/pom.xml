@@ -44,5 +44,16 @@
 
   <build>
     <finalName>QuizWebsite</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.tomcat.maven</groupId>
+        <artifactId>tomcat11-maven-plugin</artifactId>
+        <version>3.0-alpha-1</version>
+        <configuration>
+          <port>8080</port>
+          <path>/</path>
+        </configuration>
+      </plugin>
+    </plugins>
   </build>
 </project>

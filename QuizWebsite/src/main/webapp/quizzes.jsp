@@ -62,6 +62,8 @@
       <li class="nav-item">
         <a class="nav-link" href="<%= request.getContextPath() %>/history"><i class="bi bi-clock-history"></i> History</a>
       </li>
+      <li class="nav-item"><a class="nav-link" href="<%= request.getContextPath() %>/achievements">
+        <i class="bi bi-award-fill"></i> Achievements</a></li>
     </ul>
     <a href="<%= request.getContextPath() %>/LogoutServlet" class="btn btn-outline-light btn-sm">
       <i class="bi bi-box-arrow-right"></i> Log&nbsp;out
@@ -103,20 +105,26 @@
                   <i class="bi bi-question-circle"></i> ${quiz.questionCount} Qs
                   <span class="ms-2"><i class="bi bi-people"></i> ${quiz.attemptCount} attempts</span>
                 </span>
-                <c:choose>
-                  <c:when test="${quiz.questionCount == 0}">
-                    <a href="${pageContext.request.contextPath}/add-questions?quizId=${quiz.quizId}"
-                       class="btn btn-sm btn-warning fw-semibold">
-                      <i class="bi bi-plus-circle me-1"></i> Add Questions
-                    </a>
-                  </c:when>
-                  <c:otherwise>
-                    <a href="${pageContext.request.contextPath}/startQuiz?quizId=${quiz.quizId}"
-                       class="btn btn-sm btn-warning text-dark fw-semibold">
-                      <i class="bi bi-play-fill me-1"></i> Start Quiz
-                    </a>
-                  </c:otherwise>
-                </c:choose>
+                <div class="d-flex gap-2">
+                  <c:choose>
+                    <c:when test="${quiz.questionCount == 0}">
+                      <a href="${pageContext.request.contextPath}/add-questions?quizId=${quiz.quizId}"
+                         class="btn btn-sm btn-warning fw-semibold">
+                        <i class="bi bi-plus-circle me-1"></i> Add Questions
+                      </a>
+                    </c:when>
+                    <c:otherwise>
+                      <a href="${pageContext.request.contextPath}/startQuiz?quizId=${quiz.quizId}"
+                         class="btn btn-sm btn-warning text-dark fw-semibold">
+                        <i class="bi bi-play-fill me-1"></i> Start Quiz
+                      </a>
+                    </c:otherwise>
+                  </c:choose>
+                  <a href="${pageContext.request.contextPath}/challenge?quizId=${quiz.quizId}"
+                     class="btn btn-sm btn-outline-light fw-semibold">
+                    <i class="bi bi-flag me-1"></i> Challenge
+                  </a>
+                </div>
               </div>
             </div>
           </div>
@@ -149,20 +157,26 @@
                 <span class="small">
                   <i class="bi bi-question-circle"></i> ${quiz.questionCount} Qs
                 </span>
-                <c:choose>
-                  <c:when test="${quiz.questionCount == 0}">
-                    <a href="${pageContext.request.contextPath}/add-questions?quizId=${quiz.quizId}"
-                       class="btn btn-sm btn-warning fw-semibold">
-                      <i class="bi bi-plus-circle me-1"></i> Add Questions
-                    </a>
-                  </c:when>
-                  <c:otherwise>
-                    <a href="${pageContext.request.contextPath}/startQuiz?quizId=${quiz.quizId}"
-                       class="btn btn-sm btn-light text-primary fw-semibold">
-                      <i class="bi bi-play-fill me-1"></i> Start Quiz
-                    </a>
-                  </c:otherwise>
-                </c:choose>
+                <div class="d-flex gap-2">
+                  <c:choose>
+                    <c:when test="${quiz.questionCount == 0}">
+                      <a href="${pageContext.request.contextPath}/add-questions?quizId=${quiz.quizId}"
+                         class="btn btn-sm btn-warning fw-semibold">
+                        <i class="bi bi-plus-circle me-1"></i> Add Questions
+                      </a>
+                    </c:when>
+                    <c:otherwise>
+                      <a href="${pageContext.request.contextPath}/startQuiz?quizId=${quiz.quizId}"
+                         class="btn btn-sm btn-light text-primary fw-semibold">
+                        <i class="bi bi-play-fill me-1"></i> Start Quiz
+                      </a>
+                    </c:otherwise>
+                  </c:choose>
+                  <a href="${pageContext.request.contextPath}/challenge?quizId=${quiz.quizId}"
+                     class="btn btn-sm btn-outline-light fw-semibold">
+                    <i class="bi bi-flag me-1"></i> Challenge
+                  </a>
+                </div>
               </div>
             </div>
           </div>
@@ -203,7 +217,7 @@
               </c:choose>
               <a href="${pageContext.request.contextPath}/challenge?quizId=${quiz.quizId}"
                  class="btn btn-sm btn-outline-light fw-semibold">
-                <i class="bi bi-person-plus-fill me-1"></i> Challenge
+                <i class="bi bi-flag me-1"></i> Challenge
               </a>
             </div>
           </div>

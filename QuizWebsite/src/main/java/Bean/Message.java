@@ -10,6 +10,7 @@ public class Message {
     private int senderId;
     private String messageType;
     private int receiverId;
+    private Integer quizId;
 
     public String getContent() {
         return content;
@@ -59,5 +60,13 @@ public class Message {
     }
     public Timestamp getSentAt() {
         return sentAt;
+    }
+
+    public Integer getQuizId() {
+        return quizId;
+    }
+
+    public void setQuizId(Integer quizId) {
+        this.quizId = quizId;
     }
 }

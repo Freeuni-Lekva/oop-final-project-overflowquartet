@@ -71,21 +71,15 @@ public class HomeServlet extends HttpServlet {
         req.setAttribute("featuredQuizzes", featuredQuizzes);
 
         // 2) Your name for greeting
-        // MessageDAO messageDAO = new MessageDAO();
-        int unreadCount = messageDAO.countUnread(userId);
-        req.setAttribute("unreadCount", unreadCount);
         req.setAttribute("userDisplayName", currentUser.getDisplayName());
 
-        // 3) Quizzes you created
+        // 3) Unread messages count
+        int unreadCount = messageDAO.countUnread(userId);
+        req.setAttribute("unreadCount", unreadCount);
+
+        // 4) Quizzes you created
         List<Quiz> myCreated = quizDAO.getQuizzesByOwner(userId);
         req.setAttribute("myCreatedQuizzes", myCreated);
-
-        // 4) Unread messages count
-        long unread = messageDAO.getMessagesByReceiver(userId)
-                .stream()
-                .filter(m -> !m.isRead())
-                .count();
-        req.setAttribute("unreadCount", (int) unread);
 
         // 5) Your friends list
         List<Integer> friendIds = friendsDAO.getFriendIds(userId, FriendsDAO.FriendStatus.ACCEPTED);
