@@ -41,6 +41,9 @@
       padding: 1rem;
       border-radius: 0.75rem;
     }
+    .tab-pane:not(.show) {
+      display: none !important;
+    }
   </style>
 </head>
 <body>
@@ -60,6 +63,8 @@
       <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/friends"><i class="bi bi-people-fill"></i> Friends</a></li>
       <li class="nav-item"><a class="nav-link active" href="${pageContext.request.contextPath}/messages"><i class="bi bi-envelope-fill"></i> Messages</a></li>
       <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/history"><i class="bi bi-clock-history"></i> History</a></li>
+      <li class="nav-item"><a class="nav-link" href="<%= request.getContextPath() %>/achievements">
+        <i class="bi bi-award-fill"></i> Achievements</a></li>
     </ul>
     <a href="${pageContext.request.contextPath}/LogoutServlet" class="btn btn-outline-light btn-sm">
       <i class="bi bi-box-arrow-right"></i> Log out
@@ -77,17 +82,17 @@
 <main class="container" style="padding-top:2.5rem;">
   <ul class="nav nav-pills justify-content-center mb-4" id="messageTabs" role="tablist">
     <li class="nav-item" role="presentation">
-      <button class="nav-link active fw-bold" id="tab-friend" data-bs-toggle="pill" data-bs-target="#section-friend" type="button" role="tab">
+      <button class="nav-link fw-bold ${activeTab == 'friend' ? 'active' : ''}" id="tab-friend" data-bs-toggle="pill" data-bs-target="#section-friend" type="button" role="tab">
         <i class="bi bi-person-plus-fill"></i> Friend Requests
       </button>
     </li>
     <li class="nav-item" role="presentation">
-      <button class="nav-link fw-bold" id="tab-challenge" data-bs-toggle="pill" data-bs-target="#section-challenge" type="button" role="tab">
+      <button class="nav-link fw-bold ${activeTab == 'challenge' ? 'active' : ''}" id="tab-challenge" data-bs-toggle="pill" data-bs-target="#section-challenge" type="button" role="tab">
         <i class="bi bi-flag-fill"></i> Challenges
       </button>
     </li>
     <li class="nav-item" role="presentation">
-      <button class="nav-link fw-bold" id="tab-note" data-bs-toggle="pill" data-bs-target="#section-note" type="button" role="tab">
+      <button class="nav-link fw-bold ${activeTab == 'note' ? 'active' : ''}" id="tab-note" data-bs-toggle="pill" data-bs-target="#section-note" type="button" role="tab">
         <i class="bi bi-chat-left-text-fill"></i> Notes
       </button>
     </li>
@@ -95,7 +100,39 @@
 
   <div class="tab-content glass-card p-4">
     <!-- FRIEND REQUESTS -->
-    <div class="tab-pane fade show active" id="section-friend" role="tabpanel">
+    <div class="tab-pane fade ${activeTab == 'friend' ? 'show active' : (activeTab == null ? 'show active' : '')}" id="section-friend" role="tabpanel">
+      <c:if test="${not empty friendRequests}">
+        <h5 class="text-light">Friend Requests (Messages)</h5>
+        <c:forEach var="row" items="${friendRequests}">
+          <c:set var="sender" value="${row.sender}"/>
+          <c:set var="m" value="${row.message}"/>
+          <div class="mb-3 d-flex justify-content-between align-items-center">
+            <div>
+              <i class="bi bi-person-circle me-2"></i>
+              <a href="${pageContext.request.contextPath}/profile?id=${sender.userId}" class="link-light fw-bold">
+                  ${sender.displayName != null ? sender.displayName : sender.username}
+              </a>
+            </div>
+            <div class="btn-group">
+              <form method="post" action="${pageContext.request.contextPath}/messages">
+                <input type="hidden" name="senderId" value="${sender.userId}"/>
+                <input type="hidden" name="messageId" value="${m.messageId}"/>
+                <button type="submit" name="action" value="accept" class="btn btn-success btn-sm">
+                  <i class="bi bi-check"></i> Accept
+                </button>
+              </form>
+              <form method="post" action="${pageContext.request.contextPath}/messages">
+                <input type="hidden" name="senderId" value="${sender.userId}"/>
+                <input type="hidden" name="messageId" value="${m.messageId}"/>
+                <button type="submit" name="action" value="reject" class="btn btn-outline-danger btn-sm">
+                  <i class="bi bi-x"></i> Reject
+                </button>
+              </form>
+            </div>
+          </div>
+        </c:forEach>
+      </c:if>
+
       <c:if test="${not empty pendingReceived}">
         <h5 class="text-light">Pending Requests (Friends table)</h5>
         <c:forEach var="u" items="${pendingReceived}">
@@ -124,14 +161,13 @@
         </c:forEach>
       </c:if>
 
-
       <c:if test="${empty pendingReceived && empty friendRequests}">
         <p class="text-light">No pending friend requests.</p>
       </c:if>
     </div>
 
     <!-- CHALLENGES -->
-    <div class="tab-pane fade" id="section-challenge" role="tabpanel">
+    <div class="tab-pane fade ${activeTab == 'challenge' ? 'show active' : ''}" id="section-challenge" role="tabpanel">
       <c:if test="${not empty challenges}">
         <h4 class="text-center mb-4"><i class="bi bi-flag-fill text-warning"></i> Challenges</h4>
         <c:forEach var="row" items="${challenges}">
@@ -144,7 +180,7 @@
                 ${sender.displayName}
             </a>
             challenged you to take
-            <a href="${pageContext.request.contextPath}/quiz?id=${quiz.quizId}" class="text-light fw-bold text-decoration-underline">
+            <a href="${pageContext.request.contextPath}/startQuiz?quizId=${quiz.quizId}" class="text-light fw-bold text-decoration-underline">
                 ${quiz.title}
             </a>.
             <br/>
@@ -152,22 +188,80 @@
           </div>
         </c:forEach>
       </c:if>
+      <c:if test="${empty challenges}">
+        <p class="text-light text-center">No challenges received.</p>
+      </c:if>
     </div>
 
     <!-- NOTES -->
-    <div class="tab-pane fade" id="section-note" role="tabpanel">
+    <div class="tab-pane fade ${activeTab == 'note' ? 'show active' : ''}" id="section-note" role="tabpanel">
+      <!-- Send Note Form -->
+      <div class="mb-4">
+        <h5 class="text-light mb-3">Send a Note</h5>
+        
+        <!-- Note Success/Error Messages -->
+        <c:if test="${not empty noteSuccess}">
+          <div class="alert alert-success text-center" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>${noteSuccess}
+          </div>
+        </c:if>
+        <c:if test="${not empty noteError}">
+          <div class="alert alert-danger text-center" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>${noteError}
+          </div>
+        </c:if>
+        <form method="post" action="${pageContext.request.contextPath}/messages" class="mb-3">
+          <input type="hidden" name="action" value="send_note"/>
+          <div class="mb-3">
+            <label for="receiverId" class="form-label">To:</label>
+            <select name="receiverId" id="receiverId" class="form-select" required>
+              <option value="">Select a friend...</option>
+              <%
+                java.util.List<Bean.User> friends = (java.util.List<Bean.User>) request.getAttribute("friends");
+                if (friends != null && !friends.isEmpty()) {
+                    for (Bean.User friend : friends) {
+                        String displayName = friend.getDisplayName() != null ? friend.getDisplayName() : friend.getUsername();
+              %>
+                <option value="<%= friend.getUserId() %>"><%= displayName %></option>
+              <%
+                    }
+                }
+              %>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="noteContent" class="form-label">Message:</label>
+            <textarea name="noteContent" id="noteContent" class="form-control" rows="3" required 
+                      placeholder="Type your message here..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-send"></i> Send Note
+          </button>
+        </form>
+      </div>
+
+      <!-- Received Notes -->
       <c:if test="${not empty notes}">
-        <h4 class="text-center mb-4"><i class="bi bi-chat-left-text-fill"></i> Notes</h4>
+        <h5 class="text-light mb-3">Received Notes</h5>
         <c:forEach var="row" items="${notes}">
           <c:set var="sender" value="${row.sender}"/>
           <c:set var="m" value="${row.message}"/>
-          <div class="mb-3">
-            <i class="bi bi-person-circle me-1"></i>
-            <a href="${pageContext.request.contextPath}/profile?id=${sender.userId}" class="link-primary fw-semibold">
-                ${sender.displayName}
-            </a>: ${m.content}
+          <div class="mb-3 p-3" style="background: rgba(255,255,255,0.10); border-radius: 0.5rem;">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <div>
+                <i class="bi bi-person-circle me-1"></i>
+                <a href="${pageContext.request.contextPath}/profile?id=${sender.userId}" class="link-primary fw-semibold">
+                    ${sender.displayName != null ? sender.displayName : sender.username}
+                </a>
+              </div>
+              <small class="text-white-50">${m.sentAt}</small>
+            </div>
+            <div class="text-light">${m.content}</div>
           </div>
         </c:forEach>
+      </c:if>
+      <c:if test="${empty notes}">
+        <p class="text-light text-center">No notes received.</p>
       </c:if>
     </div>
   </div>
@@ -181,6 +275,44 @@
 <script>
   window.addEventListener('pageshow', evt => {
     if (evt.persisted) window.location.reload();
+  });
+  
+  // Clear note form fields if success message is shown
+  document.addEventListener('DOMContentLoaded', function() {
+    const noteSuccess = document.querySelector('.alert-success');
+    if (noteSuccess && noteSuccess.textContent.includes('Note sent successfully')) {
+      // Clear the form fields
+      const receiverSelect = document.getElementById('receiverId');
+      const noteContent = document.getElementById('noteContent');
+      if (receiverSelect) receiverSelect.value = '';
+      if (noteContent) noteContent.value = '';
+      
+      // Remove the success message after 3 seconds
+      setTimeout(() => {
+        noteSuccess.remove();
+      }, 3000);
+    }
+    
+    // Ensure proper tab switching
+    const tabButtons = document.querySelectorAll('[data-bs-toggle="pill"]');
+    const tabPanes = document.querySelectorAll('.tab-pane');
+    
+    tabButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const target = this.getAttribute('data-bs-target');
+        const targetPane = document.querySelector(target);
+        
+        // Hide all tab panes
+        tabPanes.forEach(pane => {
+          pane.classList.remove('show', 'active');
+        });
+        
+        // Show the target tab pane
+        if (targetPane) {
+          targetPane.classList.add('show', 'active');
+        }
+      });
+    });
   });
 </script>
 </body>

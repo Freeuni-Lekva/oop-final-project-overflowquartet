@@ -74,6 +74,47 @@ public class MessageDAO {
     }
 
     /**
+     * Inserts a new message with quiz_id. Returns generated message_id, or null if failure or invalid parameters.
+     */
+    public Integer createMessageWithQuiz(int senderId,
+                                         int receiverId,
+                                         String messageType,
+                                         String content,
+                                         Integer quizId) {
+        // Validate users and message type
+        if (!userExists(senderId) || !userExists(receiverId) || !ALLOWED_TYPES.contains(messageType)) {
+            return null;
+        }
+
+        String sql = "INSERT INTO messages (sender_id, receiver_id, message_type, content, quiz_id, sent_at) "
+                + "VALUES (?, ?, ?, ?, ?, NOW())";
+        try (Connection conn = DBConnector.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, senderId);
+            ps.setInt(2, receiverId);
+            ps.setString(3, messageType);
+            ps.setString(4, content);
+            if (quizId != null) {
+                ps.setInt(5, quizId);
+            } else {
+                ps.setNull(5, Types.INTEGER);
+            }
+            int affected = ps.executeUpdate();
+            if (affected == 0) {
+                return null;
+            }
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
      * Retrieves a message by its ID.
      */
     public Message getMessageById(int messageId) {
@@ -218,24 +259,30 @@ public class MessageDAO {
 
     /**
      * Sends a challenge message with both quiz ID and custom message content.
+     * Uses the quiz_id column in the database schema.
      */
     public static boolean sendChallengeMessage(int fromUserId, int toUserId, int quizId, String content) {
-        String sql = "INSERT INTO messages (sender_id, receiver_id, message_type, content, quiz_id, sent_at) " +
-                "VALUES (?, ?, 'challenge', ?, ?, NOW())";
+        System.out.println("sendChallengeMessage called with: fromUserId=" + fromUserId + 
+                          ", toUserId=" + toUserId + ", quizId=" + quizId + ", content=" + content);
+        
+        // Use the quiz_id column in the database schema
         try (Connection conn = DBConnector.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(
+                 "INSERT INTO messages (sender_id, receiver_id, message_type, content, quiz_id, sent_at) " +
+                 "VALUES (?, ?, 'challenge', ?, ?, NOW())")) {
             ps.setInt(1, fromUserId);
             ps.setInt(2, toUserId);
             ps.setString(3, content);
             ps.setInt(4, quizId);
-            ps.executeUpdate();
-            return true;
+            int result = ps.executeUpdate();
+            System.out.println("Challenge message inserted successfully. Rows affected: " + result);
+            return result > 0;
         } catch (SQLException e) {
+            System.out.println("Failed to insert challenge message: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
     }
-
 
     /**
      * Helper to map a ResultSet row to a Message object.
@@ -250,6 +297,13 @@ public class MessageDAO {
         msg.setRead(rs.getBoolean("is_read"));
         Timestamp sentAt = rs.getTimestamp("sent_at");
         msg.setSentAt(sentAt != null ? sentAt : new Timestamp(System.currentTimeMillis()));
+        
+        // Handle quiz_id which can be null
+        int quizId = rs.getInt("quiz_id");
+        if (!rs.wasNull()) {
+            msg.setQuizId(quizId);
+        }
+        
         return msg;
     }
 }

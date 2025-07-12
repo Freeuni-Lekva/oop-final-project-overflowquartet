@@ -181,4 +181,24 @@ class MessageDAOTest {
     void testDeleteMessage_nonExistent() {
         assertFalse(messageDAO.deleteMessage(-9999));
     }
+
+    @Test
+    void testSendChallengeMessage() {
+        // Test the static challenge message method
+        boolean success = MessageDAO.sendChallengeMessage(senderId, receiverId, 1, "Test challenge");
+        assertTrue(success, "Challenge message should be sent successfully");
+        
+        // Verify the message was created with quiz_id
+        List<Message> messages = messageDAO.getMessagesByReceiver(receiverId);
+        assertFalse(messages.isEmpty(), "Should have received messages");
+        
+        Message challengeMsg = messages.stream()
+                .filter(m -> "challenge".equals(m.getMessageType()))
+                .findFirst()
+                .orElse(null);
+        
+        assertNotNull(challengeMsg, "Should find challenge message");
+        assertEquals("Test challenge", challengeMsg.getContent());
+        assertEquals(Integer.valueOf(1), challengeMsg.getQuizId());
+    }
 }
