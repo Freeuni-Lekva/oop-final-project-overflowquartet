@@ -26,8 +26,20 @@ CREATE TABLE users (
                        username VARCHAR(50) NOT NULL UNIQUE,
                        password_hash VARCHAR(255) NOT NULL,
                        display_name VARCHAR(100),
+                       is_admin BOOLEAN DEFAULT FALSE,
                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                        last_login TIMESTAMP NULL
+);
+
+-- ANNOUNCEMENTS
+CREATE TABLE announcements (
+                              announcement_id INT AUTO_INCREMENT PRIMARY KEY,
+                              title VARCHAR(200) NOT NULL,
+                              content TEXT NOT NULL,
+                              created_by INT NOT NULL,
+                              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                              is_active BOOLEAN DEFAULT TRUE,
+                              FOREIGN KEY (created_by) REFERENCES users(user_id)
 );
 
 -- QUIZZES
@@ -160,9 +172,10 @@ INSERT IGNORE INTO achievements (name, description, icon_url) VALUES
 ('I am the Greatest', 'Achieved the highest score on a quiz', 'bi-trophy-fill');
 
 -- Sample users for testing login (use INSERT IGNORE to avoid duplicates)
-INSERT IGNORE INTO users (username, password_hash, display_name) VALUES
-('alice', '4e40e8ffe0ee32fa53e139147ed559229a5930f89c2204706fc174beb36210b3', 'Alice Wonderland'),
-('charlie', '2c1743a391305fbf367df8e4f069f9f9a44fbdc7e6a8e6a8e6a8e6a8e6a8e6a8e', 'Charlie Chaplin');
+INSERT IGNORE INTO users (username, password_hash, display_name, is_admin) VALUES
+('alice', '4e40e8ffe0ee32fa53e139147ed559229a5930f89c2204706fc174beb36210b3', 'Alice Wonderland', FALSE),
+('charlie', '2c1743a391305fbf367df8e4f069f9f9a44fbdc7e6a8e6a8e6a8e6a8e6a8e6a8e', 'Charlie Chaplin', FALSE),
+('admin', '4e40e8ffe0ee32fa53e139147ed559229a5930f89c2204706fc174beb36210b3', 'Administrator', TRUE);
 
 -- Sample quizzes for testing (use INSERT IGNORE to avoid duplicates)
 INSERT IGNORE INTO quizzes (owner_id, title, description, random_order, multiple_pages, immediate_correction) VALUES

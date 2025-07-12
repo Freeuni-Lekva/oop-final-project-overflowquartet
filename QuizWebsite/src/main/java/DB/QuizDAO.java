@@ -296,4 +296,41 @@ public class QuizDAO {
         }
         return list;
     }
+
+    /**
+     * Clear all history information for a particular quiz (admin function).
+     */
+    public boolean clearQuizHistory(int quizId) {
+        String sql = "DELETE FROM attempt_answers WHERE attempt_id IN (SELECT attempt_id FROM quiz_attempts WHERE quiz_id = ?)";
+        String sql2 = "DELETE FROM quiz_attempts WHERE quiz_id = ?";
+        
+        try (Connection conn = DBConnector.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                // Delete attempt answers first
+                try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                    ps.setInt(1, quizId);
+                    ps.executeUpdate();
+                }
+                
+                // Then delete quiz attempts
+                try (PreparedStatement ps = conn.prepareStatement(sql2)) {
+                    ps.setInt(1, quizId);
+                    ps.executeUpdate();
+                }
+                
+                conn.commit();
+                return true;
+            } catch (SQLException e) {
+                conn.rollback();
+                e.printStackTrace();
+                return false;
+            } finally {
+                conn.setAutoCommit(true);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

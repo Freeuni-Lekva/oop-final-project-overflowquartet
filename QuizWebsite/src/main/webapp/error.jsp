@@ -78,6 +78,13 @@
                     <i class="bi bi-award-fill"></i> Achievements
                 </a>
             </li>
+            <c:if test="${sessionScope.user.admin}">
+            <li class="nav-item">
+                <a class="nav-link" href="${pageContext.request.contextPath}/admin">
+                    <i class="bi bi-shield-fill"></i> Admin
+                </a>
+            </li>
+            </c:if>
         </ul>
         <a href="<%= request.getContextPath() %>/LogoutServlet" class="btn btn-outline-light btn-sm">
             <i class="bi bi-box-arrow-right"></i> Log&nbsp;out
