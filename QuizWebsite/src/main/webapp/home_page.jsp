@@ -73,6 +73,10 @@
                 <i class="bi bi-clock-history"></i> History</a></li>
             <li class="nav-item"><a class="nav-link" href="${ctx}/achievements">
                 <i class="bi bi-award-fill"></i> Achievements</a></li>
+            <c:if test="${user.admin}">
+            <li class="nav-item"><a class="nav-link" href="${ctx}/admin">
+                <i class="bi bi-shield-fill"></i> Admin</a></li>
+            </c:if>
         </ul>
         <a href="${ctx}/LogoutServlet" class="btn btn-outline-light btn-sm">
             <i class="bi bi-box-arrow-right"></i> Log&nbsp;out
@@ -113,6 +117,31 @@
         <a href="${ctx}/quizzes" class="btn btn-light btn-lg text-primary fw-semibold">Browse Quizzes</a>
     </div>
 </header>
+
+<!-- ANNOUNCEMENTS -->
+<c:if test="${not empty activeAnnouncements}">
+<section class="container mb-5">
+    <div class="glass-card p-4">
+        <h3 class="h4 fw-semibold mb-3">
+            <i class="bi bi-megaphone-fill me-2"></i>Announcements
+        </h3>
+        <div class="row g-3">
+            <c:forEach var="announcement" items="${activeAnnouncements}">
+                <div class="col-12">
+                    <div class="p-3 rounded" style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);">
+                        <h5 class="fw-semibold mb-2">${announcement.title}</h5>
+                        <p class="mb-2">${announcement.content}</p>
+                        <small class="text-light">
+                            <i class="bi bi-calendar3 me-1"></i>
+                            <fmt:formatDate value="${announcement.createdAt}" pattern="MMM dd, yyyy"/>
+                        </small>
+                    </div>
+                </div>
+            </c:forEach>
+        </div>
+    </div>
+</section>
+</c:if>
 
 <main class="container">
 

@@ -7,6 +7,7 @@ public class User {
     private String username;
     private String passwordHash;
     private String displayName;
+    private boolean isAdmin;
     private Timestamp createdAt;
     private Timestamp lastLogin;
 
@@ -34,6 +35,12 @@ public class User {
     }
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
+    }
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+    public void setAdmin(boolean admin) {
+        isAdmin = admin;
     }
     public Timestamp getCreatedAt() {
         return createdAt;
